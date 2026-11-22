@@ -48,6 +48,8 @@ nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
 .tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 section.view{padding-block:32px 64px}
 .stufe{margin-bottom:40px}
+.howto{border:2px solid var(--red);border-radius:12px;padding:20px 22px;margin-bottom:36px;background:var(--paper)}
+.howto ol{margin:12px 0;padding-left:22px}.howto li{margin-bottom:8px}
 .stufe header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:14px}
 .stufe header p{margin:0;color:var(--soft)}
 .badge{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
@@ -318,11 +320,19 @@ function drawPic(){
 
 /* ---------- Missionen ---------- */
 const vm=document.getElementById('v-missionen');
+const HOWTO=`<div class="howto"><h2>So geht's</h2><ol>
+<li><b>Mission aufklappen.</b> Tippe unten auf eine Mission. Fang mit Mission 1 an, sie ist schon geöffnet.</li>
+<li><b>Rätsel lösen.</b> Im roten Kasten steht eine Frage. Überleg dir zuerst selbst eine Antwort. Wenn du nicht weiterkommst, lies die Links unter „Zum Lösen lesen“.</li>
+<li><b>Lösung prüfen.</b> Tippe auf „Lösung zeigen“ und vergleiche sie mit deiner Antwort.</li>
+<li><b>Aufgabe erledigen.</b> Unter „Ergebnis“ steht eine kleine Aufgabe für deinen eigenen Betrieb. Hake sie ab, wenn du sie gemacht hast.</li>
+<li><b>Mission abschließen.</b> Tippe auf „Mission erledigt“. Die Spur oben füllt sich, und die nächste Mission geht auf.</li>
+<li><b>Stempel holen.</b> Nach vier Missionen machst du den Stufentest. Mit drei richtigen Antworten bekommt die Rechnung oben ihren Stempel.</li></ol>
+<p class="muted">Die Karteikarten kannst du jederzeit zwischendurch durchgehen, zum Beispiel unterwegs auf dem Handy.</p></div>`;
 const curId=()=>(M.find(m=>!S.done[m.id])||{}).id;
 function renderMissions(){
  const open=new Set([...vm.querySelectorAll('details[open]')].map(d=>d.dataset.id));
  const cur=curId();if(!vm.dataset.init&&cur)open.add(cur);vm.dataset.init=1;
- vm.innerHTML=STUFEN.map(st=>{
+ vm.innerHTML=HOWTO+STUFEN.map(st=>{
   const ms=M.filter(m=>m.s===st.n),dn=ms.filter(m=>S.done[m.id]).length;
   return `<div class="stufe"><header><h2>Stufe ${st.n}: ${st.name}</h2><span class="badge ${stufeDone(st.n)?'ok':''}">${stufeDone(st.n)?'Stempel erhalten':dn+' von 4 erledigt'}</span><p>${st.text}</p></header>
   ${ms.map(m=>{const d=S.done[m.id];return `<details class="m ${d?'done':''} ${m.id===cur?'cur':''}" data-id="${m.id}" ${open.has(m.id)?'open':''}>
