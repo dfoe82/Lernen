@@ -88,6 +88,33 @@ details.m[open]{background:var(--paper)}
 details.full{border-top:1px dashed var(--line);margin-top:10px;padding-top:4px}
 details.full>summary{cursor:pointer;font-weight:600;padding:10px 0;color:var(--red)}
 details.full pre{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;overflow-x:auto;white-space:pre}
+.stufenprog{margin-top:14px;display:grid;gap:6px}
+.sprow{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr) 3.2em;gap:10px;align-items:center;font-size:14px;color:var(--soft)}
+.sprow b{color:var(--ink);text-align:right;white-space:nowrap}
+.mbar{display:block;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
+.mbar i{display:block;height:100%;background:var(--red);border-radius:3px;transition:width .4s}
+.mbar.big{height:10px;flex-basis:100%;margin-top:4px}
+.sprow .mbar{margin:0}
+.unit{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:12px 16px;margin:10px 0}
+.unit.now{border:2px solid var(--red)}
+.unit.done{border-color:var(--ok)}
+.unit.locked{opacity:.5}
+.uhead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.uhead b{font-size:17px}
+.ubadge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
+.done>.uhead .ubadge{background:var(--oksoft);color:var(--ok)}
+.now>.uhead .ubadge{background:var(--redsoft);color:var(--red)}
+.linkbtn{background:none;border:0;color:var(--red);font:600 14px "Instrument Sans",sans-serif;padding:8px 0;cursor:pointer;min-height:36px}
+.kq{background:var(--paper);border-radius:8px;padding:12px 14px;margin-top:12px}
+.kq p{margin:0 0 6px}
+.kqmsg{font-size:14px;margin-top:6px;color:var(--ok)}.kqmsg.bad{color:var(--red)}
+.optbox{border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin:12px 0}
+.optbox p{margin:8px 0 2px}
+.pgroup{margin-bottom:22px}.pgroup h3{margin-bottom:6px}
+details.howto>summary{cursor:pointer;list-style:none}details.howto>summary::-webkit-details-marker{display:none}
+details.howto>summary h2::after{content:"  ▾";font-size:20px;color:var(--red)}
+details.howto[open]>summary h2::after{content:"  ▴"}
+@media(max-width:600px){.sprow{grid-template-columns:minmax(0,1fr) 3.2em}.sprow .mbar{grid-column:1/-1;grid-row:2}.unit{padding:12px}}
 .body table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0}
 .body td,.body th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 .body th{font-weight:600}
@@ -134,13 +161,12 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft
 <div class="wrap hero">
   <div>
     <h1>Die Reise der Rechnung 2026-0417</h1>
-    <p class="lead">Ein Lernkurs zur Eingangsrechnungsverarbeitung in zwölf Missionen. Du begleitest eine Rechnung vom Briefkasten bis ins Archiv und sammelst für jede Stufe einen Stempel.</p>
+    <p class="lead">Ein Lernkurs zur Eingangsrechnungsverarbeitung in zwölf Missionen, aufgeteilt in kurze Häppchen von 2 bis 6 Minuten. Du begleitest eine Rechnung vom Briefkasten bis ins Archiv und sammelst für jede Stufe einen Stempel.</p>
     <div class="stats">
-      <div class="stat"><b id="sDone">0</b><span>von 12 Missionen</span></div>
-      <div class="stat"><b id="sStamps">0</b><span>von 3 Stempeln</span></div>
-      <div class="stat"><b id="sCards">0</b><span>Karteikarten gewusst</span></div>
+      <div class="stat"><b id="sPct">0 %</b><span id="sPctSub">Gesamtfortschritt</span></div>
     </div>
     <div class="bar" aria-hidden="true"><i id="pbar" style="width:0"></i></div>
+    <div id="stufenProg" class="stufenprog"></div>
     <div class="next" id="next"></div>
   </div>
   <div class="fig">
@@ -152,13 +178,14 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft
   <button class="tab" role="tab" id="t-missionen" aria-selected="true" data-v="missionen">Missionen</button>
   <button class="tab" role="tab" id="t-tests" aria-selected="false" data-v="tests">Stufentests</button>
   <button class="tab" role="tab" id="t-karten" aria-selected="false" data-v="karten">Karteikarten</button>
+  <button class="tab" role="tab" id="t-praxis" aria-selected="false" data-v="praxis">Praxis</button>
 </div></nav>
 
 <section class="view wrap" id="v-missionen"></section>
 
 <section class="view wrap" id="v-tests" hidden>
   <h2>Stufentests</h2>
-  <p class="muted">Vier Fragen pro Stufe. Ein Test öffnet sich, sobald du alle Texte der vier Missionen dieser Stufe gelesen hast. Ab drei richtigen Antworten und mit allen vier erledigten Missionen gibt es den Stempel.</p>
+  <p class="muted">Vier Fragen pro Stufe. Ein Test öffnet sich, sobald alle Lesehäppchen seiner Stufe geschafft sind. Ab drei richtigen Antworten zählt er als bestanden. Den Stempel gibt es, wenn auch alle Rätsel der Stufe gelöst sind.</p>
   <div class="pick" id="testPick"></div>
   <div id="testBox"></div>
 </section>
@@ -169,9 +196,15 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft
   <div id="cardBox"></div>
 </section>
 
+<section class="view wrap" id="v-praxis" hidden>
+  <h2>Praxis</h2>
+  <p class="muted">Aufgaben für deinen eigenen Betrieb. Sie zählen nicht zum Lernfortschritt, du kannst sie erledigen, wann es passt. <span id="praxisCount"></span></p>
+  <div id="praxisBox"></div>
+</section>
+
 <div class="wrap"><div class="cert" id="cert">
   <h2>Geschafft</h2>
-  <p>Alle zwölf Missionen und alle drei Stufentests sind erledigt. Die Rechnung 2026-0417 ist geprüft, freigegeben, gebucht und archiviert, und du weißt, warum.</p>
+  <p>Alle Häppchen und alle drei Stufentests sind geschafft. Die Rechnung 2026-0417 ist geprüft, freigegeben, gebucht und archiviert, und du weißt, warum.</p>
 </div></div>
 
 <footer class="wrap">
@@ -378,31 +411,69 @@ const C=[
  ['Ab welchem Betrag verlangt d.velop smart invoice beim Vier-Augen-Prinzip eine zweite Person?','Über 10.000 €'],
  ['Wer ist beim Vier-Augen-Prinzip von der Freigabe ausgeschlossen?','Wer die sachliche Prüfung gemacht hat']];
 
+/* Kontrollfrage je Pflichttext: [Frage, Antworten, richtig, Erklärung] */
+const KQ={
+ 'm1-0':['Was kommt zuerst?',['Freigeben','Prüfen','Das ist egal'],1,'Freigegeben wird nur, was vorher geprüft ist.'],
+ 'm1-1':['Was fragt die sachliche Prüfung laut Lido?',['Ob alle Pflichtangaben da sind','Ob geliefert wurde und Menge und Preis zur Bestellung passen','Ob die Rechnung schon im Archiv liegt'],1,'Pflichtangaben und Rechenfehler gehören zur formalen Prüfung.'],
+ 'm2-0':['Welche Angabe gehört nicht zu den Pflichtangaben?',['Zeitpunkt der Lieferung','Telefonnummer des Lieferanten','Steuernummer oder USt-IdNr. des Lieferanten'],1,'Eine Telefonnummer ist praktisch, aber keine Pflicht.'],
+ 'm3-0':['Was fragt die rechnerische Prüfung?',['Ob die Summen stimmen','Ob geliefert wurde','Ob alle Angaben da sind'],0,'Geliefert ist die sachliche, Angaben die formale Prüfung.'],
+ 'm3-1':['Warum korrigierst du Fehler auf einer Rechnung nie selbst?',['Weil es zu lange dauert','Weil die Rechnung im Original erhalten bleiben muss','Weil das nur die Bank darf'],1,'Du forderst beim Lieferanten eine korrigierte Rechnung an.'],
+ 'm4-0':['Ab welchem Betrag verlangt d.velop smart invoice beim Vier-Augen-Prinzip eine zweite Person?',['Über 1.000 €','Über 10.000 €','Über 100.000 €'],1,'Über 10.000 € ist immer eine zweite Person nötig.'],
+ 'm5-0':['Wie lange bewahrst du Rechnungen seit 2025 auf?',['Sechs Jahre','Zehn Jahre','Acht Jahre'],2,'Seit 1. Januar 2025 gelten für Buchungsbelege acht Jahre.'],
+ 'm5-1':['Eine Rechnung kam im November 2026. Ab wann darf sie frühestens weg?',['Ab November 2034','Ab Anfang 2035','Ab Anfang 2037'],1,'Die Frist beginnt erst am Ende des Jahres 2026 und läuft dann acht Jahre.'],
+ 'm5-2':['Was musst du bei einer E-Rechnung auf jeden Fall aufbewahren?',['Die XML-Datei','Einen Ausdruck','Nur die PDF-Ansicht'],0,'Wichtig ist der strukturierte Teil, ein Ausdruck reicht nicht.'],
+ 'm6-0':['Braucht ein kleiner Betrieb mit elektronischer Ablage eine Verfahrensdokumentation?',['Nein, erst ab 50 Beschäftigten','Nur mit Steuerberater','Ja, egal wie klein'],2,'Jedes Unternehmen, das Belege elektronisch aufbewahrt, braucht sie.'],
+ 'm7-0':['Seit wann müssen alle Unternehmen E-Rechnungen empfangen können?',['Seit 2025','Ab 2027','Ab 2028'],0,'Die Empfangspflicht gilt seit 1. Januar 2025.'],
+ 'm7-1':['Müssen Kleinunternehmer E-Rechnungen empfangen können?',['Nein','Ja','Erst ab 2028'],1,'Ausstellen müssen sie nicht, empfangen schon.'],
+ 'm7-2':['Was zählt bei ZUGFeRD laut IHK Koblenz?',['Das Bild im PDF','Der strukturierte Teil','Beides gleich'],1,'Bei hybriden Formaten zählt nur der strukturierte Teil.'],
+ 'm8-0':['Eine E-Mail mit PDF-Anhang ist …',['eine sonstige Rechnung','eine E-Rechnung','eine Kleinbetragsrechnung'],0,'Eine PDF zeigt nur an, sie enthält keine strukturierten Daten.'],
+ 'm9-0':['Was steht in BT-112?',['Die Rechnungsnummer','Das Fälligkeitsdatum','Die Summe mit Steuer'],2,'BT-1 ist die Rechnungsnummer, BT-9 das Fälligkeitsdatum.'],
+ 'm9-1':['Was steht bei Rechnungen an Behörden in BT-10?',['Die Leitweg-ID','Die IBAN','Das Lieferdatum'],0,'Zwischen Firmen reicht dort ein Platzhalter.'],
+ 'm9-2':['Was ist am Muster der Bundesagentur für Arbeit besonders?',['Es ist ein Antragsformular','Jedes Feld ist mit seiner BT-Nummer markiert','Es zeigt eine Gehaltsabrechnung'],1,'Deshalb lohnt sich hier der Blick auf das Original.'],
+ 'm10-0':['Welche ZUGFeRD-Profile sind keine gültige E-Rechnung?',['EN 16931 und EXTENDED','XRECHNUNG','MINIMUM und BASIC WL'],2,'Ihnen fehlen die Rechnungspositionen.'],
+ 'm10-1':['Ab welcher ZUGFeRD-Version zählt das Format als E-Rechnung?',['1.0','2.0.1','3.0'],1,'Version 1.0 entspricht der Norm noch nicht.'],
+ 'm11-0':['Wo findest du fertige ZUGFeRD-Beispieldateien?',['Beim FeRD unter „ZUGFeRD-Beispielrechnungen“','Beim Finanzamt per Post','Nirgends, man muss sie selbst bauen'],0,'Die Beispiele kann man dort herunterladen.'],
+ 'm11-1':['Was kann der Viewer in ELSTER?',['E-Rechnungen erstellen','E-Rechnungen anzeigen und prüfen','Rechnungen bezahlen'],1,'Erstellen kann er keine Rechnungen.'],
+ 'm12-0':['Was macht die Einstellung „Auswahl anbieten“?',['Alle Treffer bekommen die Aufgabe','Die Software wählt zufällig','Die Person im vorigen Schritt wählt aus'],2,'„Alle Treffer verwenden“ gibt die Aufgabe an alle.'],
+ 'm12-1':['Was legt der Onboarding-Assistent in d.velop smart invoice an?',['Einen Ablauf mit Verteilung, Prüfung, Freigabe und Buchhaltung','Eine Steuererklärung','Eine Internetseite'],0,'Danach passt man den Ablauf an den eigenen Betrieb an.']};
+
 /* ---------- Zustand ---------- */
 const KEY='reise-der-rechnung-v1';
-const blank=()=>({done:{},tasks:{},tests:{},known:[],order:[],read:{},ans:{},sol:{}});
+const blank=()=>({done:{},tasks:{},tests:{},known:[],order:[],read:{},ans:{},sol:{},hq:{}});
 let S=blank();
 try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x)S={...S,...x}}catch(e){}
 let dbRef=null,saving=false,again=false,timer=null;
-const merge=o=>{if(!o)return;for(const k of ['done','tasks','read','sol'])S[k]={...(o[k]||{}),...S[k]};S.ans={...(o.ans||{}),...S.ans};
+const merge=o=>{if(!o)return;for(const k of ['done','tasks','read','sol','hq'])S[k]={...(o[k]||{}),...S[k]};S.ans={...(o.ans||{}),...S.ans};
  for(const k in o.tests||{})S.tests[k]=Math.max(S.tests[k]||0,o.tests[k]);
- S.known=[...new Set([...(o.known||[]),...S.known])];if(!S.order.length&&o.order)S.order=o.order};
+ S.known=[...new Set([...(o.known||[]),...S.known])];if(!S.order.length&&o.order)S.order=o.order;migrate()};
 async function flush(){if(!dbRef)return;if(saving){again=true;return}saving=true;
  try{await dbRef.set(JSON.parse(JSON.stringify(S)))}catch(e){}saving=false;if(again){again=false;flush()}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(timer);timer=setTimeout(flush,800)}
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const req=m=>m.texte.map((t,i)=>({t,k:m.id+'-'+i})).filter(x=>!x.t.opt);
-const readDone=m=>req(m).every(x=>S.read[x.k]);
-const unlocked=m=>m.n===1||S.done[m.id]||S.done['m'+(m.n-1)];
-const stufeRead=n=>M.filter(m=>m.s===n).every(readDone);
-const stufeDone=n=>M.filter(m=>m.s===n).every(m=>S.done[m.id])&&(S.tests[n]||0)>=3;
+/* Häppchen: jeder Pflichttext und das Rätsel */
+const units=m=>[...m.texte.map((t,i)=>({kind:'read',k:m.id+'-'+i,t,i})).filter(u=>!u.t.opt),{kind:'raetsel',k:m.id+'-r'}];
+const uDone=(m,u)=>u.kind==='read'?!!S.hq[u.k]:!!S.sol[m.id];
+const mDone=m=>units(m).every(u=>uDone(m,u));
+const mCount=m=>{const us=units(m);return [us.filter(u=>uDone(m,u)).length,us.length]};
+const unlocked=m=>m.n===1||mDone(M[m.n-2])||mCount(m)[0]>0;
+const stufeRead=n=>M.filter(m=>m.s===n).every(m=>units(m).filter(u=>u.kind==='read').every(u=>uDone(m,u)));
+const passed=n=>(S.tests[n]||0)>=3;
+const stufeDone=n=>M.filter(m=>m.s===n).every(mDone)&&passed(n);
+function stufeProg(n){let d=0,t=0;M.filter(m=>m.s===n).forEach(m=>{const [a,b]=mCount(m);d+=a;t+=b});t++;if(passed(n))d++;return [d,t]}
+function totalProg(){let d=0,t=0;[1,2,3].forEach(n=>{const [a,b]=stufeProg(n);d+=a;t+=b});return [d,t]}
+const pct=([a,b])=>Math.round(a/b*100);
+const uMin=u=>u.kind==='raetsel'?'5 Min':u.t.src==='Kurs'?'2 Min':u.t.full?'6 Min':u.t.empf?'4 Min, mit ganzem Text ca. 15 Min':'4 Min';
+/* alten Fortschritt übernehmen */
+function migrate(){M.forEach(m=>{units(m).forEach(u=>{if(u.kind==='read'&&(S.read[u.k]||S.done[m.id]))S.hq[u.k]=true});if(S.done[m.id])S.sol[m.id]=true})}
+migrate();
+const nextUnit=()=>{for(const m of M){for(const u of units(m))if(!uDone(m,u))return {m,u}}return null};
 
 /* ---------- Bild ---------- */
 const pic=document.getElementById('pic');
 function drawPic(){
  const st=[1,2,3].map(stufeDone);
- const dots=M.map((m,i)=>{const x=40+i*(480/11),on=S.done[m.id];
+ const dots=M.map((m,i)=>{const x=40+i*(480/11),on=mDone(m);
   return `<circle cx="${x}" cy="384" r="${on?9:7}" fill="${on?'var(--red)':'var(--bg)'}" stroke="${on?'var(--red)':'var(--soft)'}" stroke-width="2"/>`}).join('');
  const gaps=[4,8].map(k=>{const x=40+(k-.5)*(480/11);return `<line x1="${x}" x2="${x}" y1="370" y2="398" stroke="var(--soft)" stroke-width="1"/>`}).join('');
  const stamp=(i,x,y,r,txt)=>`<g class="stamp ${st[i]?'on':''}" transform="rotate(${r} ${x} ${y})"><rect x="${x-78}" y="${y-24}" width="156" height="48" rx="6" fill="none" stroke="var(--red)" stroke-width="4"/><text x="${x}" y="${y+9}" text-anchor="middle" font-family="Sofia Sans Condensed,sans-serif" font-weight="800" font-size="26" fill="var(--red)" letter-spacing="1">${txt}</text></g>`;
@@ -425,69 +496,92 @@ function drawPic(){
 
 /* ---------- Missionen ---------- */
 const vm=document.getElementById('v-missionen');
-const HOWTO=`<div class="howto"><h2>So geht's</h2><p>Jede Mission hat drei Schritte. Der nächste Schritt öffnet sich erst, wenn der vorige erledigt ist.</p><ol>
-<li><b>Lesen.</b> Zu jedem Text gibt es eine Zusammenfassung. Meist reicht sie. Wo ein rotes Schild „Ganzen Text lesen empfohlen“ steht, lies den ganzen Text. Hake jeden Text mit „Gelesen“ ab. Texte mit dem Schild „freiwillig“ musst du nicht lesen.</li>
-<li><b>Rätsel beantworten.</b> Schreib deine Antwort in das Feld. Danach siehst du die Lösung zum Vergleichen.</li>
-<li><b>Ergebnis.</b> Erledige die kleine Aufgabe für deinen eigenen Betrieb und tippe auf „Mission erledigt“. Dann öffnet sich die nächste Mission.</li></ol>
-<p class="muted">Der Stufentest öffnet sich, sobald du alle Texte der vier Missionen einer Stufe gelesen hast. Mit drei richtigen Antworten und allen vier Missionen bekommt die Rechnung oben ihren Stempel.</p></div>`;
-const curId=()=>(M.find(m=>!S.done[m.id])||{}).id;
-function textCard(m,t,i){
- const k=m.id+'-'+i,rd=S.read[k];
- return `<div class="txt ${rd?'isread':''}">
-  <div class="txthead"><b>${t.t}</b>${t.empf?'<span class="empf">Ganzen Text lesen empfohlen</span>':''}${t.opt?'<span class="opt">freiwillig</span>':''}</div>
+const HOWTO=`<details class="howto"><summary><h2>So geht's</h2></summary><p>Der Kurs besteht aus kurzen Häppchen von 2 bis 5 Minuten. Du kannst nach jedem Häppchen aufhören, die App merkt sich, wo du warst.</p><ol>
+<li><b>Lesehäppchen.</b> Lies die Zusammenfassung eines Textes. Wo „Ganzen Text lesen empfohlen“ steht, nimm dir etwas mehr Zeit und lies den ganzen Text. Danach beantwortest du eine Kontrollfrage. Ist sie richtig, ist das Häppchen geschafft.</li>
+<li><b>Rätselhäppchen.</b> Am Ende jeder Mission schreibst du deine Antwort auf das Rätsel und vergleichst sie mit der Lösung.</li>
+<li><b>Stufentest.</b> Sind alle Lesehäppchen einer Stufe geschafft, öffnet sich der Test. Mit drei richtigen Antworten bekommt die Rechnung oben ihren Stempel.</li></ol>
+<p class="muted">Die Aufgaben für deinen eigenen Betrieb stehen im Reiter „Praxis“. Die kannst du erledigen, wann es passt.</p></details>`;
+const openUnits=new Set();
+function readUnit(m,u,state){
+ const t=u.t,q=KQ[u.k],done=state==='done';
+ const head=`<div class="uhead"><span class="ubadge">${done?'geschafft':'Lesen · '+uMin(u)}</span><b>${t.t}</b>${t.empf?'<span class="empf">Ganzen Text lesen empfohlen</span>':''}</div>`;
+ if(state==='locked')return `<div class="unit locked"><div class="uhead"><span class="ubadge">Lesen</span><b>${t.t}</b></div></div>`;
+ if(done&&!openUnits.has(u.k))return `<div class="unit done">${head}<button class="linkbtn" data-peek="${u.k}">Noch einmal ansehen</button></div>`;
+ return `<div class="unit ${done?'done':'now'}" id="u-${u.k}">${head}
   <div class="src">${t.src}</div>
   ${t.empf&&t.why?`<p class="why2">${t.why}</p>`:''}
   <div class="sum"><small>${t.full||t.u?'Zusammenfassung':'Text'}</small>${t.sum}</div>
   ${t.warn?`<div class="warnbox">Achtung: ${t.warn}</div>`:''}
-  ${t.full?`<details class="full" ${t.empf&&!rd?'open':''}><summary>Ganzen Text lesen</summary>${t.full}</details>`:''}
-  <div class="row">${t.u?`<a class="btn" href="${t.u}" target="_blank" rel="noopener">Ganzen Text öffnen</a>`:''}
-   ${t.opt?'':`<button class="btn ${rd?'okb':'main'}" data-read="${k}">${rd?'Gelesen':'Als gelesen markieren'}</button>`}</div>
+  ${t.full?`<details class="full" ${t.empf&&!done?'open':''}><summary>Ganzen Text lesen</summary>${t.full}</details>`:''}
+  ${t.u?`<div class="row"><a class="btn" href="${t.u}" target="_blank" rel="noopener">Ganzen Text öffnen</a></div>`:''}
+  ${q?`<div class="kq"><p><b>Kontrollfrage:</b> ${q[0]}</p>${q[1].map((o,j)=>`<label class="optn ${done&&j===q[2]?'right':''}"><input type="radio" name="kq-${u.k}" value="${j}" ${done&&j===q[2]?'checked':''} ${done?'disabled':''}><span>${o}</span></label>`).join('')}
+   <div class="kqmsg" id="msg-${u.k}">${done?'Richtig. '+q[3]:''}</div>
+   ${done?`<button class="linkbtn" data-hide="${u.k}">Zuklappen</button>`:`<div class="row"><button class="btn main" data-kq="${u.k}">Antwort prüfen</button></div>`}</div>`:''}
+ </div>`;
+}
+function riddleUnit(m,state){
+ const sol=S.sol[m.id];
+ if(state==='locked')return `<div class="unit locked"><div class="uhead"><span class="ubadge">Rätsel</span><b>Das Rätsel der Mission</b></div></div>`;
+ const nx=M[m.n];
+ return `<div class="unit ${sol?'done':'now'}" id="u-${m.id}-r"><div class="uhead"><span class="ubadge">${sol?'geschafft':'Rätsel · 5 Min'}</span><b>Das Rätsel der Mission</b></div>
+  <div class="raetsel"><b>Rätsel</b>${m.r}</div>
+  ${sol?`<div class="mine"><small>Deine Antwort</small>${esc(S.ans[m.id]||'')}</div><div class="loes"><small>Lösung</small>${m.l}</div>
+   <div class="row"><button class="btn" data-redo="${m.id}">Antwort ändern</button>${nx&&!mDone(nx)?`<button class="btn main" data-go="${nx.id}">Weiter mit Mission ${nx.n}</button>`:''}</div>`:
+  `<label for="a-${m.id}" class="muted">Deine Antwort</label><textarea id="a-${m.id}" data-ans="${m.id}" placeholder="Schreib hier deine Antwort, ein paar Wörter reichen.">${esc(S.ans[m.id]||'')}</textarea>
+   <div class="row"><button class="btn main" data-give="${m.id}">Antwort abgeben und Lösung zeigen</button></div>`}
  </div>`;
 }
 function missionBody(m){
- const rd=readDone(m),sol=S.sol[m.id],d=S.done[m.id];
- const left=req(m).filter(x=>!S.read[x.k]).length;
- return `<div class="body">
-  <div class="step"><h3>Schritt 1: Lesen</h3><p class="hint0">${rd?'Alle Texte gelesen.':`Noch ${left} ${left===1?'Text':'Texte'} zu lesen.`}</p>
-   ${m.texte.map((t,i)=>textCard(m,t,i)).join('')}</div>
-  <div class="step ${rd?'':'locked'}"><h3>Schritt 2: Rätsel beantworten</h3><p class="lockmsg">Öffnet sich, wenn alle Texte in Schritt 1 als gelesen markiert sind.</p>
-   <div class="raetsel"><b>Rätsel</b>${m.r}</div>
-   ${sol?`<div class="mine"><small>Deine Antwort</small>${esc(S.ans[m.id]||'')}</div><div class="loes"><small>Lösung</small>${m.l}</div><div class="row"><button class="btn" data-redo="${m.id}">Antwort ändern</button></div>`:
-   `<label for="a-${m.id}" class="muted">Deine Antwort</label><textarea id="a-${m.id}" data-ans="${m.id}" placeholder="Schreib hier deine Antwort, ein paar Wörter reichen.">${esc(S.ans[m.id]||'')}</textarea>
-   <div class="row"><button class="btn main" data-give="${m.id}">Antwort abgeben und Lösung zeigen</button></div>`}</div>
-  <div class="step ${sol?'':'locked'}"><h3>Schritt 3: Ergebnis</h3><p class="lockmsg">Öffnet sich, wenn du das Rätsel beantwortet hast.</p>
-   ${m.a.map((t,i)=>{const k=m.id+'-'+i;return `<label class="task"><input type="checkbox" data-task="${k}" ${S.tasks[k]?'checked':''}><span>${t}</span></label>`}).join('')}
-   <div class="row"><button class="btn ${d?'':'main'}" data-done="${m.id}">${d?'Wieder öffnen':'Mission erledigt'}</button></div></div>
+ const us=units(m);let seenOpen=false;
+ const opt=m.texte.filter(t=>t.opt);
+ return `<div class="body">${us.map(u=>{const d=uDone(m,u);let st=d?'done':seenOpen?'locked':'now';if(!d)seenOpen=true;
+   return u.kind==='read'?readUnit(m,u,st):riddleUnit(m,st)}).join('')}
+  ${opt.length?`<div class="optbox"><b>Freiwillig zum Weiterlesen</b>${opt.map(t=>`<p><a href="${t.u}" target="_blank" rel="noopener">${t.t}</a> <span class="src">${t.src}</span></p><div class="sum">${t.sum}</div>${t.warn?`<div class="warnbox">Achtung: ${t.warn}</div>`:''}`).join('')}</div>`:''}
+  <p class="muted">Praxisaufgabe zu dieser Mission: ${m.a[0]}${m.a.length>1?' und '+(m.a.length-1)+' weitere':''}. Du findest sie im Reiter „Praxis“.</p>
  </div>`;
 }
+const pbar=(p,cls='')=>`<span class="mbar ${cls}"><i style="width:${p}%"></i></span>`;
 function renderMissions(){
  const open=new Set([...vm.querySelectorAll('details.m[open]')].map(d=>d.dataset.id));
- const cur=curId();if(!vm.dataset.init&&cur)open.add(cur);vm.dataset.init=1;
- vm.innerHTML=HOWTO+STUFEN.map(st=>{
-  const ms=M.filter(m=>m.s===st.n),dn=ms.filter(m=>S.done[m.id]).length;
-  return `<div class="stufe"><header><h2>Stufe ${st.n}: ${st.name}</h2><span class="badge ${stufeDone(st.n)?'ok':''}">${stufeDone(st.n)?'Stempel erhalten':dn+' von 4 erledigt'}</span><p>${st.text}</p></header>
-  ${ms.map(m=>{const d=S.done[m.id];
-   if(!unlocked(m))return `<div class="m locked"><div class="lockrow"><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>Öffnet sich nach Mission ${m.n-1}</small></span><span class="badge">gesperrt</span></div></div>`;
-   const stp=d?'erledigt':S.sol[m.id]?'Schritt 3':readDone(m)?'Schritt 2':'Schritt 1';
-   return `<details class="m ${d?'done':''} ${m.id===cur?'cur':''}" data-id="${m.id}" ${open.has(m.id)?'open':''}>
-   <summary><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${m.min} Minuten · ${stp}</small></span><span class="badge ${d?'ok':''}">${d?'erledigt':m.id===cur?'als Nächstes':'offen'}</span></summary>
+ const nu=nextUnit();if(!vm.dataset.init&&nu)open.add(nu.m.id);vm.dataset.init=1;
+ vm.innerHTML=(totalProg()[0]?HOWTO:HOWTO.replace('<details class="howto">','<details class="howto" open>'))+STUFEN.map(st=>{
+  const ms=M.filter(m=>m.s===st.n),sp=stufeProg(st.n),p=pct(sp);
+  return `<div class="stufe"><header><h2>Stufe ${st.n}: ${st.name}</h2><span class="badge ${stufeDone(st.n)?'ok':''}">${stufeDone(st.n)?'Stempel erhalten':p+' %'}</span><p>${st.text}</p>${pbar(p,'big')}</header>
+  ${ms.map(m=>{const d=mDone(m),[a,b]=mCount(m),mp=Math.round(a/b*100);
+   if(!unlocked(m))return `<div class="m locked"><div class="lockrow"><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${b} Häppchen · öffnet sich nach Mission ${m.n-1}</small></span><span class="badge">gesperrt</span></div></div>`;
+   return `<details class="m ${d?'done':''} ${nu&&nu.m.id===m.id?'cur':''}" data-id="${m.id}" ${open.has(m.id)?'open':''}>
+   <summary><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${a} von ${b} Häppchen · ${mp} %</small>${pbar(mp)}</span><span class="badge ${d?'ok':''}">${d?'erledigt':nu&&nu.m.id===m.id?'als Nächstes':mp+' %'}</span></summary>
    ${missionBody(m)}</details>`}).join('')}
-  <div class="row"><button class="btn" data-gotest="${st.n}" ${stufeRead(st.n)?'':'disabled'}>Stufentest ${st.n}${stufeRead(st.n)?' machen':' (erst alle Texte lesen)'}${S.tests[st.n]!=null?' · bisher '+S.tests[st.n]+' von 4':''}</button></div></div>`}).join('');
+  <div class="row"><button class="btn" data-gotest="${st.n}" ${stufeRead(st.n)?'':'disabled'}>Stufentest ${st.n}${stufeRead(st.n)?' machen':' (erst alle Lesehäppchen)'}${S.tests[st.n]!=null?' · bisher '+S.tests[st.n]+' von 4':''}</button></div></div>`}).join('');
 }
 function rerenderKeepScroll(){const y=scrollY;renderAll();scrollTo(0,y)}
+function goTo(id){const d=vm.querySelector(`details[data-id="${id.split('-')[0]}"]`);if(d)d.open=true;const el=document.getElementById('u-'+id)||d;if(el){el.scrollIntoView({block:'start'});scrollBy(0,-64)}}
 vm.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.read){const k=b.dataset.read;if(S.read[k])delete S.read[k];else S.read[k]=true;save();rerenderKeepScroll()}
+ if(b.dataset.kq){const k=b.dataset.kq,q=KQ[k],sel=vm.querySelector(`input[name="kq-${k}"]:checked`),msg=document.getElementById('msg-'+k);
+  if(!sel){msg.className='kqmsg bad';msg.textContent='Wähle zuerst eine Antwort aus.';return}
+  if(+sel.value===q[2]){S.hq[k]=true;save();const y=scrollY;renderAll();scrollTo(0,y);const n=nextUnit();if(n&&n.m.id===k.split('-')[0]){goTo(n.u.kind==='read'?n.u.k:n.m.id+'-r')}}
+  else{msg.className='kqmsg bad';msg.textContent='Nicht ganz. Lies die Zusammenfassung noch einmal und versuch es erneut.';sel.closest('.optn').classList.add('wrong')}}
  if(b.dataset.give){const id=b.dataset.give,ta=vm.querySelector(`textarea[data-ans="${id}"]`),v=(ta&&ta.value||'').trim();
   if(v.length<2){ta.focus();ta.placeholder='Schreib zuerst eine Antwort, auch eine Vermutung zählt.';return}
   S.ans[id]=v;S.sol[id]=true;save();rerenderKeepScroll()}
  if(b.dataset.redo){delete S.sol[b.dataset.redo];save();rerenderKeepScroll()}
- if(b.dataset.done){const id=b.dataset.done;if(S.done[id])delete S.done[id];else S.done[id]=true;save();
-  if(S.done[id]){const nx=curId();renderAll();const d=vm.querySelector(`details[data-id="${id}"]`);if(d)d.open=false;const n=vm.querySelector(`details[data-id="${nx}"]`);if(n){n.open=true;n.scrollIntoView({block:'start'});scrollBy(0,-60)}}else rerenderKeepScroll()}
+ if(b.dataset.go){const id=b.dataset.go;const cur=vm.querySelector('details.m[open]');renderAll();vm.querySelectorAll('details.m[open]').forEach(d=>{if(d.dataset.id!==id)d.open=false});goTo(id)}
+ if(b.dataset.peek){openUnits.add(b.dataset.peek);rerenderKeepScroll()}
+ if(b.dataset.hide){openUnits.delete(b.dataset.hide);rerenderKeepScroll()}
  if(b.dataset.gotest){show('tests');pickTest(+b.dataset.gotest);scrollTo(0,document.getElementById('v-tests').offsetTop-60)}
 });
+vm.addEventListener('change',e=>{if(e.target.name&&e.target.name.startsWith('kq-')){const m=document.getElementById('msg-'+e.target.name.slice(3));if(m){m.textContent='';m.className='kqmsg'}vm.querySelectorAll(`input[name="${e.target.name}"]`).forEach(i=>i.closest('.optn').classList.remove('wrong'))}});
 vm.addEventListener('input',e=>{const id=e.target.dataset.ans;if(id){S.ans[id]=e.target.value;save()}});
-vm.addEventListener('change',e=>{const k=e.target.dataset.task;if(!k)return;if(e.target.checked)S.tasks[k]=true;else delete S.tasks[k];save()});
+
+/* ---------- Praxis ---------- */
+const vp=document.getElementById('praxisBox');
+function renderPraxis(){
+ const all=M.flatMap(m=>m.a.map((t,i)=>m.id+'-'+i)),dn=all.filter(k=>S.tasks[k]).length;
+ document.getElementById('praxisCount').textContent=`${dn} von ${all.length} erledigt`;
+ vp.innerHTML=M.map(m=>`<div class="pgroup"><h3>Mission ${m.n}: ${m.t}</h3>${m.a.map((t,i)=>{const k=m.id+'-'+i;return `<label class="task"><input type="checkbox" data-task="${k}" ${S.tasks[k]?'checked':''}><span>${t}</span></label>`}).join('')}</div>`).join('');
+}
+vp.addEventListener('change',e=>{const k=e.target.dataset.task;if(!k)return;if(e.target.checked)S.tasks[k]=true;else delete S.tasks[k];save();renderPraxis()});
 
 /* ---------- Tests ---------- */
 let curTest=1;
@@ -496,8 +590,8 @@ function pickTest(n){curTest=n;renderTest()}
 const pickHtml=()=>STUFEN.map(s=>`<button class="btn" aria-pressed="${s.n===curTest}" data-t="${s.n}">Stufe ${s.n}: ${s.name}${S.tests[s.n]!=null?' · '+S.tests[s.n]+'/4':''}</button>`).join('');
 function renderTest(){
  tp.innerHTML=pickHtml();
- if(!stufeRead(curTest)){const miss=M.filter(m=>m.s===curTest&&!readDone(m)).map(m=>m.n);
-  tb.innerHTML=`<div class="lockbox">Dieser Test öffnet sich, wenn du alle Texte der Stufe ${curTest} gelesen hast. Es fehlen noch Texte in ${miss.length===1?'Mission':'den Missionen'} ${miss.join(', ')}.</div>`;return}
+ if(!stufeRead(curTest)){const miss=M.filter(m=>m.s===curTest&&!units(m).filter(u=>u.kind==='read').every(u=>uDone(m,u))).map(m=>m.n);
+  tb.innerHTML=`<div class="lockbox">Dieser Test öffnet sich, wenn alle Lesehäppchen der Stufe ${curTest} geschafft sind. Es fehlen noch Häppchen in ${miss.length===1?'Mission':'den Missionen'} ${miss.join(', ')}.</div>`;return}
  tb.innerHTML=Q[curTest].map((q,i)=>`<div class="q" data-q="${i}"><p>${i+1}. ${q[0]}</p>${q[1].map((o,j)=>`<label class="optn"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}<div class="why">${q[3]}</div></div>`).join('')+
  `<div class="result" id="res"></div><div class="row"><button class="btn main" id="check">Auswerten</button><button class="btn" id="again">Neu versuchen</button></div>`;
 }
@@ -512,8 +606,8 @@ tb.addEventListener('click',e=>{
  const r=document.getElementById('res');
  if(miss){r.textContent=`Noch ${miss} ${miss===1?'Frage':'Fragen'} offen.`;return}
  S.tests[curTest]=Math.max(S.tests[curTest]||0,ok);save();
- const ms=M.filter(m=>m.s===curTest&&!S.done[m.id]).length;
- r.textContent=`${ok} von 4 richtig. `+(ok>=3?(ms?`Bestanden. Für den Stempel fehlen noch ${ms} ${ms===1?'Mission':'Missionen'} dieser Stufe.`:'Bestanden, der Stempel ist deiner.'):'Für den Stempel braucht es drei richtige. Lies die Erklärungen und versuch es noch einmal.');
+ const ms=M.filter(m=>m.s===curTest&&!mDone(m)).length;
+ r.textContent=`${ok} von 4 richtig. `+(ok>=3?(ms?`Bestanden. Für den Stempel fehlen noch Rätsel in ${ms} ${ms===1?'Mission':'Missionen'} dieser Stufe.`:'Bestanden, der Stempel ist deiner.'):'Für den Stempel braucht es drei richtige. Lies die Erklärungen und versuch es noch einmal.');
  renderTop();renderMissions();tp.innerHTML=pickHtml();
 });
 
@@ -539,26 +633,36 @@ cb.addEventListener('keydown',e=>{if(e.target.id==='card'&&(e.key==='Enter'||e.k
 
 /* ---------- Kopf, Reiter, Reset ---------- */
 function renderTop(){
- const dn=M.filter(m=>S.done[m.id]).length,stamps=[1,2,3].filter(stufeDone).length;
- document.getElementById('sDone').textContent=dn;document.getElementById('sStamps').textContent=stamps;
- document.getElementById('sCards').textContent=S.known.length;
- document.getElementById('pbar').style.width=(dn/12*100)+'%';
- const nx=M.find(m=>!S.done[m.id]);const open=[1,2,3].find(n=>!stufeDone(n));
- const stp=nx?(S.sol[nx.id]?'Schritt 3: Ergebnis':readDone(nx)?'Schritt 2: Rätsel beantworten':'Schritt 1: Lesen'):'';
- document.getElementById('next').innerHTML=nx?`<small>Als Nächstes</small>Mission ${nx.n}: ${nx.t} · ${stp}`:open?`<small>Als Nächstes</small>Stufentest ${open} bestehen`:`<small>Fertig</small>Alle Stempel gesammelt`;
- document.getElementById('cert').classList.toggle('on',stamps===3);
+ const tp_=totalProg(),p=pct(tp_);
+ document.getElementById('sPct').textContent=p+' %';
+ document.getElementById('sPctSub').textContent=`${tp_[0]} von ${tp_[1]} Schritten geschafft`;
+ document.getElementById('pbar').style.width=p+'%';
+ document.getElementById('stufenProg').innerHTML=STUFEN.map(s=>{const sp=stufeProg(s.n),q=pct(sp);return `<div class="sprow"><span>Stufe ${s.n}: ${s.name}</span>${pbar(q)}<b>${q} %</b></div>`}).join('');
+ const nu=nextUnit(),open=[1,2,3].find(n=>!passed(n)&&stufeRead(n));
+ let html;
+ if(nu){const lbl=nu.u.kind==='read'?nu.u.t.t:'Das Rätsel der Mission';html=`<small>Als Nächstes · Mission ${nu.m.n}, ${uMin(nu.u)}</small>${lbl}<div class="row"><button class="btn main" id="goNext">Weiterlernen</button></div>`}
+ else if(open)html=`<small>Als Nächstes</small>Stufentest ${open} bestehen<div class="row"><button class="btn main" id="goTest" data-n="${open}">Zum Test</button></div>`;
+ else html=`<small>Fertig</small>Alle Häppchen und Tests geschafft`;
+ const t=[1,2,3].find(n=>stufeRead(n)&&!passed(n)&&(!nu||nu.m.s>n));
+ if(nu&&t)html+=`<p class="muted" style="margin:8px 0 0">Der Stufentest ${t} ist offen. <button class="linkbtn" id="goTest" data-n="${t}">Zum Test</button></p>`;
+ document.getElementById('next').innerHTML=html;
+ document.getElementById('cert').classList.toggle('on',[1,2,3].every(stufeDone));
  drawPic();
 }
+document.getElementById('next').addEventListener('click',e=>{
+ if(e.target.id==='goNext'){show('missionen');const nu=nextUnit();if(!nu)return;renderMissions();vm.querySelectorAll('details.m[open]').forEach(d=>{if(d.dataset.id!==nu.m.id)d.open=false});goTo(nu.u.kind==='read'?nu.u.k:nu.m.id+'-r')}
+ if(e.target.id==='goTest'){show('tests');pickTest(+e.target.dataset.n);scrollTo(0,document.getElementById('v-tests').offsetTop-60)}
+});
 function renderAll(){renderTop();renderMissions()}
 function show(v){document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===v));
- ['missionen','tests','karten'].forEach(k=>document.getElementById('v-'+k).hidden=k!==v);
- if(v==='karten')renderCards();if(v==='tests')renderTest()}
+ ['missionen','tests','karten','praxis'].forEach(k=>document.getElementById('v-'+k).hidden=k!==v);
+ if(v==='karten')renderCards();if(v==='tests')renderTest();if(v==='praxis')renderPraxis()}
 document.querySelector('nav.tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)show(t.dataset.v)});
 const rs=document.getElementById('reset');let armed=false;
 rs.addEventListener('click',()=>{if(!armed){armed=true;rs.textContent='Wirklich alles zurücksetzen?';setTimeout(()=>{armed=false;rs.textContent='Fortschritt zurücksetzen'},4000);return}
- S=blank();armed=false;rs.textContent='Fortschritt zurücksetzen';save();vm.dataset.init='';renderAll();renderTest();renderCards()});
+ S=blank();openUnits.clear();armed=false;rs.textContent='Fortschritt zurücksetzen';save();vm.dataset.init='';renderAll();renderTest();renderCards();renderPraxis()});
 
-renderAll();renderTest();
+renderAll();renderTest();renderPraxis();
 
 /* ---------- Speichern im Konto ---------- */
 (async()=>{
@@ -569,7 +673,7 @@ renderAll();renderTest();
   if(!db||!user)return;const id=await user.id();if(!id)return;
   dbRef=db.doc('data/users/'+id+'/progress');
   const snap=await dbRef.get();
-  if(snap.exists){merge(snap.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}rerenderKeepScroll()}
+  if(snap.exists){merge(snap.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}rerenderKeepScroll();renderPraxis()}
   await flush();
   document.getElementById('saveNote').textContent='Dein Fortschritt wird in deinem Konto gespeichert und ist auf jedem Gerät da.';
  }catch(e){dbRef=null}
