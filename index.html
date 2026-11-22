@@ -13,12 +13,13 @@ VOICE: ruhig, sachlich, ein bisschen Spiel. Wie ein Arbeitsheft, das man gern au
 IDEA: eine echte Papierrechnung, die Stempel bekommt, während man lernt.
 PICTURE: die Nordwind-Rechnung als Blatt mit drei Stempeln und darunter eine Spur aus 12 Stationen.
 COLOUR and TYPE: Weiß, Schwarz, Zinnober als Stempelfarbe. Sofia Sans Condensed für Titel, Instrument Sans für Text.
-LAYOUT: oben Titel und Fortschritt, daneben das Blatt; darunter Reiter Missionen, Stufentests, Karteikarten.
+LAYOUT: oben Titel und Fortschritt, daneben das Blatt; darunter Reiter; jede Mission in drei Schritten Lesen, Antworten, Ergebnis.
 */
 :root{color-scheme:light dark;
 --bg:light-dark(#ffffff,#120d0b);--ink:light-dark(#141210,#f3eeea);--soft:light-dark(#5d5853,#b6aca5);
 --line:light-dark(#e4e0dc,#2f2724);--paper:light-dark(#fbf9f6,#1d1714);--red:light-dark(#e8401a,#ff6a43);
---redsoft:light-dark(#fde9e3,#3a1c13);--ok:light-dark(#1f7a4a,#5fcf8f);--oksoft:light-dark(#e3f3ea,#14301f)}
+--redsoft:light-dark(#fde9e3,#3a1c13);--ok:light-dark(#1f7a4a,#5fcf8f);--oksoft:light-dark(#e3f3ea,#14301f);
+--warn:light-dark(#8a5a00,#f0c062);--warnsoft:light-dark(#fbf0d9,#33270f)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Instrument Sans",system-ui,sans-serif;overflow-x:clip}
@@ -39,55 +40,80 @@ a{color:var(--red)}
 .next small{display:block;color:var(--soft);font-size:13px}
 .fig{position:relative;min-height:400px}
 .fig>svg{position:absolute;inset:0;width:100%;height:100%}
-.stamp{opacity:0;transform-box:fill-box;transform-origin:center;transition:opacity .4s,transform .4s}
-.stamp.on{opacity:.92}
+.stamp{opacity:0;transition:opacity .4s}.stamp.on{opacity:.92}
 nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
 nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
 .tab{flex:none;min-height:48px;padding:0 18px;border:0;background:none;color:var(--soft);font:600 16px "Instrument Sans",sans-serif;border-bottom:3px solid transparent;cursor:pointer}
 .tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--red)}
-.tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 section.view{padding-block:32px 64px}
-.stufe{margin-bottom:40px}
 .howto{border:2px solid var(--red);border-radius:12px;padding:20px 22px;margin-bottom:36px;background:var(--paper)}
 .howto ol{margin:12px 0;padding-left:22px}.howto li{margin-bottom:8px}
+.stufe{margin-bottom:40px}
 .stufe header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:14px}
 .stufe header p{margin:0;color:var(--soft)}
 .badge{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
 .badge.ok{background:var(--oksoft);color:var(--ok)}
-details.m{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--bg)}
+.m{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--bg)}
 details.m[open]{background:var(--paper)}
-details.m summary{list-style:none;display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;min-height:56px}
-details.m summary::-webkit-details-marker{display:none}
+.m>summary,.m>.lockrow{list-style:none;display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;min-height:56px}
+.m>summary{cursor:pointer}
+.m>summary::-webkit-details-marker{display:none}
+.m.locked{opacity:.55}
 .num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:600;border:2px solid var(--line);color:var(--soft)}
 .done .num{background:var(--red);border-color:var(--red);color:#fff}
 .cur .num{border-color:var(--red);color:var(--red)}
 .mt{font-weight:600}
 .mt small{display:block;font-weight:400;color:var(--soft);font-size:14px}
 .body{padding:4px 16px 18px 68px}
-.raetsel{background:var(--redsoft);border-radius:8px;padding:12px 14px;margin:6px 0 12px}
-.raetsel b{display:block;font-size:13px;color:var(--red);margin-bottom:2px}
-.loes{display:none;background:var(--oksoft);border-radius:8px;padding:12px 14px;margin:0 0 12px}
-.loes.on{display:block}
-.body h4{margin:16px 0 4px;font-size:15px}
-.body ul{margin:4px 0;padding-left:20px}
+.step{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.step:first-child{border-top:0;margin-top:0;padding-top:4px}
+.step h3{font-size:20px;margin-bottom:4px}
+.step .hint0{color:var(--soft);font-size:14px;margin:0 0 10px}
+.step.locked>*:not(h3):not(.lockmsg){display:none}
+.lockmsg{display:none;color:var(--soft);font-size:15px;margin:4px 0 0}
+.step.locked .lockmsg{display:block}
+.txt{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:14px 16px;margin:10px 0}
+.txt.isread{border-color:var(--ok)}
+.txthead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.txthead b{font-size:17px}
+.src{font-size:13px;color:var(--soft)}
+.empf{font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--red);color:#fff;white-space:nowrap}
+.opt{font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
+.why2{font-size:14px;color:var(--red);margin:6px 0 0;font-weight:500}
+.sum{margin-top:10px}
+.sum>small{display:block;font-size:12px;font-weight:600;color:var(--soft);text-transform:none;margin-bottom:2px}
+.sum p{margin:0 0 8px}.sum ul{margin:4px 0 8px;padding-left:20px}
+.warnbox{background:var(--warnsoft);color:var(--warn);border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
+details.full{border-top:1px dashed var(--line);margin-top:10px;padding-top:4px}
+details.full>summary{cursor:pointer;font-weight:600;padding:10px 0;color:var(--red)}
+details.full pre{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;overflow-x:auto;white-space:pre}
 .body table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0}
 .body td,.body th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 .body th{font-weight:600}
+.raetsel{background:var(--redsoft);border-radius:8px;padding:12px 14px;margin:6px 0 12px}
+.raetsel b{display:block;font-size:13px;color:var(--red);margin-bottom:2px}
+textarea{width:100%;min-height:96px;font:16px/1.5 "Instrument Sans",sans-serif;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.loes{background:var(--oksoft);border-radius:8px;padding:12px 14px;margin:10px 0}
+.mine{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
+.mine small,.loes small{display:block;font-size:12px;font-weight:600;color:var(--soft)}
 .task{display:flex;gap:10px;align-items:flex-start;padding:6px 0}
 .task input{width:22px;height:22px;margin-top:2px;accent-color:var(--red);flex:none}
-.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.btn{min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:600 15px "Instrument Sans",sans-serif;cursor:pointer}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:600 15px "Instrument Sans",sans-serif;cursor:pointer;text-decoration:none}
 .btn.main{background:var(--red);border-color:var(--red);color:#fff}
+.btn.okb{border-color:var(--ok);color:var(--ok)}
 .btn:disabled{opacity:.45;cursor:default}
 .q{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
 .q p{margin:0 0 8px;font-weight:600}
-.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px;cursor:pointer;min-height:44px}
-.opt input{width:20px;height:20px;margin-top:3px;accent-color:var(--red);flex:none}
-.opt.right{background:var(--oksoft)}.opt.wrong{background:var(--redsoft)}
+.optn{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px;cursor:pointer;min-height:44px}
+.optn input{width:20px;height:20px;margin-top:3px;accent-color:var(--red);flex:none}
+.optn.right{background:var(--oksoft)}.optn.wrong{background:var(--redsoft)}
 .why{display:none;font-size:14px;color:var(--soft);margin-top:6px}.checked .why{display:block}
 .result{font-size:18px;font-weight:600;margin:6px 0 14px}
 .pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .pick .btn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.lockbox{border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--soft)}
 .card{perspective:1200px;max-width:560px;height:280px;margin:12px 0 18px;cursor:pointer}
 .card .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
 .card.flip .in{transform:rotateY(180deg)}
@@ -100,7 +126,7 @@ details.m summary::-webkit-details-marker{display:none}
 .cert.on{display:block}
 footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft);font-size:14px}
 @media(max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}.fig{min-height:340px}}
-@media(max-width:600px){.body{padding:4px 14px 16px}details.m summary{grid-template-columns:36px minmax(0,1fr)}details.m summary .badge{display:none}.fig{min-height:290px}.card{height:300px}}
+@media(max-width:600px){.body{padding:4px 12px 16px}.m>summary,.m>.lockrow{grid-template-columns:36px minmax(0,1fr)}.m>summary .badge,.m>.lockrow .badge{display:none}.fig{min-height:290px}.card{height:300px}.txt{padding:12px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -117,8 +143,8 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft
     <div class="bar" aria-hidden="true"><i id="pbar" style="width:0"></i></div>
     <div class="next" id="next"></div>
   </div>
-  <div class="fig" aria-label="Die Nordwind-Rechnung mit den Stempeln der drei Stufen">
-    <svg id="pic" viewBox="0 0 560 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Rechnung mit Stempeln und Fortschrittsspur"></svg>
+  <div class="fig">
+    <svg id="pic" viewBox="0 0 560 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Die Nordwind-Rechnung mit den Stempeln der drei Stufen und einer Spur aus zwölf Stationen"></svg>
   </div>
 </div>
 
@@ -132,7 +158,7 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft
 
 <section class="view wrap" id="v-tests" hidden>
   <h2>Stufentests</h2>
-  <p class="muted">Vier Fragen pro Stufe. Ab drei richtigen Antworten und mit allen vier Missionen der Stufe gibt es den Stempel.</p>
+  <p class="muted">Vier Fragen pro Stufe. Ein Test öffnet sich, sobald du alle Texte der vier Missionen dieser Stufe gelesen hast. Ab drei richtigen Antworten und mit allen vier erledigten Missionen gibt es den Stempel.</p>
   <div class="pick" id="testPick"></div>
   <div id="testBox"></div>
 </section>
@@ -149,93 +175,164 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft
 </div></div>
 
 <footer class="wrap">
-  <p>Zum Nachlesen: <a href="https://claude.ai/artifact/6Ehgqir8UUQgGgdKfwNGug">Lernkurs als Dokument</a> und <a href="https://claude.ai/artifact/Aje7R1cU9Sd1VGquMAE49u">Anleitung zu d.velop smart invoice</a>. Holzspielzeug Nordwind und die Rechnung sind erfunden.</p>
+  <p>Zum Nachlesen: <a href="https://claude.ai/artifact/6Ehgqir8UUQgGgdKfwNGug">Lernkurs als Dokument</a> und <a href="https://claude.ai/artifact/Aje7R1cU9Sd1VGquMAE49u">Anleitung zu d.velop smart invoice</a>. Holzspielzeug Nordwind und die Rechnung sind erfunden. Die Zusammenfassungen fremder Texte sind eigene Worte, Stand November 2026.</p>
   <p id="saveNote">Dein Fortschritt wird in diesem Browser gespeichert.</p>
   <p><button class="btn" id="reset">Fortschritt zurücksetzen</button></p>
 </footer>
 
 <script>
 {
-const L=(t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
-const U={lido:'https://www.lido.app/de/rechnungsverarbeitung',candis:'https://candis.io/blog/eingangsrechnung',dvelop:'https://claude.ai/artifact/Aje7R1cU9Sd1VGquMAE49u',gobd:'https://www.ihk.de/blueprint/servlet/resource/blob/4053008/fd800a11f8032d918eba074db593bcb9/gobd-praxisleitfaden-data.pdf',lex:'https://www.lexware.de/fileadmin/user_upload/Leitfaden_GoBD.pdf',ihkrn:'https://www.ihk.de/rhein-neckar/recht/steuerrecht/umsatzsteuer/e-rechnungspflicht-5931752',ihkko:'https://www.ihk.de/koblenz/unternehmensservice/recht/steuerrecht/umsatzsteuer/neue-umsatzsteuerregelung-ab-2025-die-erechnung-kommt-6137018',haufe:'https://www.haufe.de/wissen/finance/e-rechnung',agicap:'https://agicap.com/de/artikel/xrechnung/',experte:'https://www.experte.de/buchhaltung/e-rechnung-beispiel',lexprof:'https://www.lexware.de/wissen/faktura-warenwirtschaft/elektronische-rechnungen-zugferd-xrechnung',lidoz:'https://www.lido.app/de/zugferd',ferd:'https://www.ferd-net.de',ihkdus:'https://www.ihk.de/duesseldorf/recht-und-steuern/die-e-rechnung-kommt--6182206'};
+const U={lido:'https://www.lido.app/de/rechnungsverarbeitung',candis:'https://candis.io/blog/eingangsrechnung',dvelop:'https://claude.ai/artifact/Aje7R1cU9Sd1VGquMAE49u',ihkkn:'https://www.ihk.de/konstanz/recht-und-steuern/steuer-und-finanzpolitik/finverwal/aufbewahrung-von-geschaeftsunterlagen-1672476',ihkgera:'https://www.ihk.de/gera/recht-und-steuern/aktuelles-rechtundsteuern/aufbewahrung-von-e-rechnungen-6636974',awv:'https://www.awv-net.de/gobd-leitfaden',lex:'https://www.lexware.de/fileadmin/user_upload/Leitfaden_GoBD.pdf',ihkrn:'https://www.ihk.de/rhein-neckar/recht/steuerrecht/umsatzsteuer/e-rechnungspflicht-5931752',ihkko:'https://www.ihk.de/koblenz/unternehmensservice/recht/steuerrecht/umsatzsteuer/neue-umsatzsteuerregelung-ab-2025-die-erechnung-kommt-6137018',haufe:'https://www.haufe.de/wissen/finance/e-rechnung',agicap:'https://agicap.com/de/artikel/xrechnung/',experte:'https://www.experte.de/buchhaltung/e-rechnung-beispiel',lexprof:'https://www.lexware.de/wissen/faktura-warenwirtschaft/elektronische-rechnungen-zugferd-xrechnung',lidoz:'https://www.lido.app/de/zugferd',ferd:'https://www.ferd-net.de/standards/zugferd',ihkdus:'https://www.ihk.de/duesseldorf/recht-und-steuern/die-e-rechnung-kommt--6182206'};
 
 const STUFEN=[
  {n:1,name:'Einsteiger',text:'Den Weg einer Rechnung kennen und erkennen, ob sie in Ordnung ist.',stamp:'GEPRÜFT'},
  {n:2,name:'Praktiker',text:'Richtig ablegen und verstehen, was die E-Rechnung verändert.',stamp:'ARCHIVIERT'},
  {n:3,name:'Profi',text:'E-Rechnungen auf Feldebene lesen und den eigenen Ablauf entwerfen.',stamp:'E-RECHNUNG'}];
 
+const OLD10='nennt noch zehn Jahre Aufbewahrung. Seit 2025 gelten für Rechnungen acht Jahre.';
+
+/* Texte je Mission: t Titel, src Quelle, u Link, sum Zusammenfassung, full Volltext in der App, empf Volltext empfohlen, why Grund, warn Hinweis, opt freiwillig */
 const M=[
 {s:1,t:'Die Rechnung ist da',min:20,
  r:'Die Nordwind-Rechnung liegt vor dir. In welche Reihenfolge gehören: bezahlen, prüfen, archivieren, erfassen, freigeben, buchen?',
  l:'Erfassen, prüfen, freigeben, buchen, bezahlen, archivieren.',
- read:[['Rechnungsverarbeitung, Leitfaden von Lido',U.lido]],
- k:'<p>Sieben Stationen: Eingang, Erfassung, Prüfung, Freigabe, Buchung, Zahlung, Archiv. Das ist in jedem Betrieb gleich, ob mit Ordner oder Software.</p>',
+ texte:[
+  {t:'Das Wichtigste in Kürze',src:'Kurs',sum:'<p>Jede Eingangsrechnung durchläuft sieben Stationen: Eingang, Erfassung, Prüfung, Freigabe, Buchung, Zahlung, Archiv. Das ist in jedem Betrieb gleich, ob mit Ordner oder mit Software. Wichtig ist die Reihenfolge: Freigegeben wird nur, was geprüft ist, und gebucht wird nur, was freigegeben ist.</p>'},
+  {t:'Rechnungsverarbeitung: Der vollständige Leitfaden',src:'Lido, Blogartikel, ca. 2.000 Wörter',u:U.lido,
+   sum:'<p>Der Artikel teilt den Ablauf in acht Schritte:</p><ul><li>Eingang per Post, E-Mail, Portal oder als E-Rechnung, am besten über einen zentralen Kanal</li><li>Papier scannen, bildgleich und vollständig</li><li>die wichtigen Angaben aus dem Beleg auslesen</li><li>formale Prüfung auf Pflichtangaben und Rechenfehler, bei Mängeln zurück an den Lieferanten</li><li>sachliche Prüfung: Wurde geliefert, passen Menge und Preis zur Bestellung?</li><li>Freigabe nach Betragsgrenzen und Kostenstellen</li><li>Buchung und Zahlung</li><li>Archivierung, unveränderbar und auffindbar</li></ul><p>Der Rest des Artikels stellt Software-Anbieter vor und ist für die Mission nicht nötig.</p>',
+   warn:'Der Artikel '+OLD10}],
  a:['Bei drei eigenen Rechnungen notieren, wer sie geprüft, bezahlt und abgelegt hat']},
 {s:1,t:'Detektivarbeit',min:30,
  r:'Auf der Rechnung stehen Name und Anschrift von Nordwind und von dir, das Datum, die Nummer 2026-0417, die Artikel mit Menge, 1.200 € netto und 19 % Umsatzsteuer über 228 €. Als Summe steht da 1.418 €. Finde die drei Fehler.',
  l:'Es fehlen die Steuernummer oder USt-IdNr. von Nordwind und der Zeitpunkt der Lieferung. Die Summe ist falsch, richtig wären 1.428 €.',
- read:[],
- k:'<p>Pflichtangaben nach § 14 Abs. 4 UStG:</p><ul><li>Name und Anschrift von Lieferant und Empfänger</li><li>Steuernummer oder USt-IdNr. des Lieferanten</li><li>Ausstellungsdatum und fortlaufende Rechnungsnummer</li><li>Menge und Art der Leistung</li><li>Zeitpunkt der Lieferung oder Leistung</li><li>Nettobetrag, Steuersatz und Steuerbetrag</li></ul><p>Bis 250 € brutto reicht eine Kleinbetragsrechnung (§ 33 UStDV): Lieferant, Datum, Leistung, Bruttobetrag, Steuersatz.</p>',
+ texte:[
+  {t:'Pflichtangaben einer Rechnung',src:'Kurs, nach § 14 Abs. 4 UStG',empf:true,why:'Hier ist der Volltext die Liste selbst. Lies jeden Punkt, das Rätsel fragt genau danach.',
+   sum:'<p>Eine Rechnung über 250 € brutto braucht sechs Gruppen von Angaben: wer liefert und wer bekommt, die Steuernummer des Lieferanten, Datum und Nummer, was geliefert wurde, wann geliefert wurde, und die Beträge mit Steuer.</p>',
+   full:'<ul><li>Name und Anschrift von Lieferant und Empfänger</li><li>Steuernummer oder USt-IdNr. des Lieferanten</li><li>Ausstellungsdatum und fortlaufende Rechnungsnummer</li><li>Menge und Art der Leistung</li><li>Zeitpunkt der Lieferung oder Leistung</li><li>Nettobetrag, Steuersatz und Steuerbetrag, oder ein Hinweis, warum keine Steuer anfällt</li></ul><p>Bis 250 € brutto reicht eine Kleinbetragsrechnung (§ 33 UStDV). Sie braucht nur Name und Anschrift des Lieferanten, das Datum, die Leistung, den Bruttobetrag und den Steuersatz. Der Empfänger muss nicht draufstehen.</p>'}],
  a:['Fünf echte Rechnungen gegen die Liste prüfen']},
 {s:1,t:'Fehler gefunden, und jetzt?',min:30,
  r:'Du willst die Summe mit dem Kuli korrigieren. Darfst du das? Und auf dem Lieferschein stehen nur zwei Kisten Bausteine statt drei.',
  l:'Nein, korrigieren muss Nordwind. Wegen der fehlenden Kiste ist die Rechnung auch sachlich falsch. Du bittest um eine neue Rechnung.',
- read:[['Eingangsrechnungen prüfen, Candis',U.candis]],
- k:'<p>Drei Prüfungen: formal (Pflichtangaben), rechnerisch (Summen) und sachlich (so bestellt und geliefert?). Fehler korrigiert nie der Empfänger.</p>',
+ texte:[
+  {t:'Das Wichtigste in Kürze',src:'Kurs',sum:'<p>Es gibt drei Prüfungen. Die formale fragt, ob alle Pflichtangaben da sind. Die rechnerische fragt, ob die Summen stimmen. Die sachliche fragt, ob das so bestellt und geliefert wurde.</p>'},
+  {t:'Eingangsrechnungen: Definition, Prüfung und Verarbeitung',src:'Candis, Blogartikel',u:U.candis,
+   sum:'<ul><li>Eine Eingangsrechnung ist eine Rechnung, die du von einem Lieferanten bekommst. Vor Buchung und Zahlung wird sie geprüft und freigegeben.</li><li>Formal prüfst du die Pflichtangaben, sachlich gleichst du mit Lieferschein, Bestellung oder Vertrag ab.</li><li>Fehler korrigierst du nie selbst, denn die Rechnung muss im Original erhalten bleiben. Du forderst beim Lieferanten eine korrigierte Fassung an.</li><li>Ohne korrekte Rechnung kann der Vorsteuerabzug wegfallen.</li><li>Typische Fehler: fehlende Angaben, doppelte Rechnungen und bei E-Rechnungen Unterschiede zwischen PDF und XML.</li></ul>',
+   warn:'Der Artikel '+OLD10}],
  a:['Eine kurze Nachricht an Nordwind schreiben und um eine korrigierte Rechnung bitten']},
 {s:1,t:'Wer darf Ja sagen?',min:30,
  r:'Du hast die Lieferung geprüft. Darfst du die Rechnung auch gleich selbst freigeben? Und wenn sie über 15.000 € läge?',
- l:'Besser nicht. Prüfen und Freigeben sollten verschiedene Personen machen. d.velop smart invoice verlangt ab 10.000 € eine zweite Person und schließt den sachlichen Prüfer von der Freigabe aus.',
- read:[['Anleitung d.velop smart invoice, Abschnitt Vier-Augen-Prinzip',U.dvelop]],
- k:'<p>Das Vier-Augen-Prinzip trennt Prüfen und Freigeben. Ab einer Betragsgrenze braucht es zwingend eine zweite Person.</p>',
+ l:'Besser nicht. Prüfen und Freigeben sollten verschiedene Personen machen. d.velop smart invoice verlangt über 10.000 € eine zweite Person und schließt den sachlichen Prüfer von der Freigabe aus.',
+ texte:[
+  {t:'Vier-Augen-Prinzip',src:'Deine Anleitung zu d.velop smart invoice',u:U.dvelop,
+   sum:'<ul><li>Das Vier-Augen-Prinzip trennt Prüfen und Freigeben.</li><li>In d.velop smart invoice greift es bei Beträgen über 10.000 €: Dann braucht es immer eine zweite Person, auch wenn eigentlich eine reichen würde.</li><li>Wer die Rechnung sachlich geprüft hat, darf sie nicht freigeben.</li><li>Man kann einen Mindestbetrag einstellen, darunter darf die Freigabe übersprungen werden.</li></ul>'}],
  a:['Festlegen: Wer prüft, wer gibt frei, ab welchem Betrag braucht es eine zweite Person?']},
 {s:2,t:'Ab ins Archiv',min:45,
  r:'Die korrigierte Rechnung kommt auf Papier. Du scannst sie, wirfst das Papier weg und löschst die erste, fehlerhafte Rechnung. Was davon ist in Ordnung?',
- l:'Scannen ist in Ordnung, wenn der Scan bildgleich und vollständig ist und das Vorgehen dokumentiert ist. Die erste Rechnung löschst du nicht, sie gehört zum Vorgang.',
- read:[['GoBD-Praxisleitfaden der IHK',U.gobd]],
- k:'<p>Belege müssen nachvollziehbar, vollständig, richtig, zeitgerecht, geordnet und unverändert aufbewahrt werden. Rechnungen seit 2025: acht Jahre.</p>',
+ l:'Scannen ist in Ordnung, wenn der Scan bildgleich und vollständig ist und das Vorgehen dokumentiert ist. Das Papier darf danach weg. Die erste Rechnung löschst du nicht, sie gehört zum Vorgang.',
+ texte:[
+  {t:'Das Wichtigste in Kürze',src:'Kurs',sum:'<p>Die GoBD sind die Regeln der Finanzverwaltung für digitale Buchführung. Belege müssen nachvollziehbar, vollständig, richtig, zeitgerecht, geordnet und unverändert aufbewahrt werden. Rechnungen bewahrst du seit 2025 acht Jahre auf.</p>'},
+  {t:'Aufbewahrung von Geschäftsunterlagen',src:'IHK Hochrhein-Bodensee (Konstanz), Ratgeber mit den Regeln ab 2025',u:U.ihkkn,empf:true,why:'Lies das Kapitel zur Form der Aufbewahrung ganz. Dort steht, wann ein Scan reicht und was bei E-Rechnungen gilt. Die lange ABC-Tabelle am Ende kannst du auslassen.',
+   sum:'<ul><li>Rechnungen und andere Buchungsbelege werden seit 1. Januar 2025 acht Jahre aufbewahrt, vorher zehn. Bücher, Jahresabschlüsse und die Verfahrensdokumentation bleiben bei zehn Jahren, Geschäftsbriefe bei sechs.</li><li>Die Frist beginnt am Ende des Jahres, in dem die Rechnung eingegangen ist. Eine Rechnung vom November 2026 darf also frühestens Anfang 2035 weg.</li><li>Rechnungen dürfen als Scan aufbewahrt werden, wenn der Scan inhaltlich und bildlich mit dem Original übereinstimmt und jederzeit lesbar ist. Jahresabschlüsse und Eröffnungsbilanzen bleiben im Original.</li><li>Bei E-Rechnungen wird der strukturierte Teil unverändert im Eingangsformat gespeichert, umwandeln ist nicht erlaubt.</li><li>Die Ablage muss revisionssicher sein und während der ganzen Frist lesbar bleiben.</li></ul>'},
+  {t:'Aufbewahrung von E-Rechnungen',src:'IHK Ostthüringen, Juli 2025',u:U.ihkgera,
+   sum:'<ul><li>Die Finanzverwaltung hat die GoBD im Juli 2025 an die E-Rechnung angepasst.</li><li>Eingehende E-Rechnungen werden elektronisch im Originalformat aufbewahrt. Ein Ausdruck oder nur die PDF reicht nicht.</li><li>Wichtig ist der strukturierte Teil, also die XML. Die PDF-Ansicht muss nur dann zusätzlich aufbewahrt werden, wenn sie steuerlich wichtige Angaben enthält, die nicht in der XML stehen, etwa Buchungsvermerke.</li><li>Beim Umwandeln in ein anderes Format dürfen die Daten nicht verändert werden.</li></ul>'},
+  {t:'GoBD: Ein Praxisleitfaden für Unternehmen, Version 2.2',src:'AWV, kostenloser Download, Dezember 2023',u:U.awv,opt:true,
+   sum:'<p>Der ausführliche Leitfaden der Arbeitsgemeinschaft für wirtschaftliche Verwaltung, entwickelt mit den Kammern. Gut zum Nachschlagen einzelner Fragen, für die Mission aber zu lang.</p>',
+   warn:'Version 2.2 ist von Ende 2023. Die achtjährige Frist und die GoBD-Änderung zur E-Rechnung vom Juli 2025 stehen noch nicht darin. Eine neue Version ist angekündigt.'}],
  a:['Prüfen, ob die eigene Ablage Dateien vor nachträglichem Ändern schützt']},
 {s:2,t:'Schreib es auf',min:45,
  r:'Ein Betriebsprüfer fragt: „Wie kommt bei Ihnen eine Rechnung ins Archiv?“ Kannst du das in einer Minute erklären?',
  l:'Deine eigene Antwort. Wenn du sie in fünf Sätzen aufschreiben kannst, hast du den Kern einer Verfahrensdokumentation.',
- read:[['Leitfaden GoBD von Lexware',U.lex]],
- k:'<p>Die Verfahrensdokumentation beschreibt, wie Belege ankommen, wer sie bearbeitet, wo sie landen und wer Zugriff hat.</p>',
+ texte:[
+  {t:'Leitfaden GoBD',src:'Lexware, PDF',u:U.lex,empf:true,why:'Lies den Abschnitt zur Verfahrensdokumentation ganz. Er ist die Vorlage für deine eigene Aufgabe in dieser Mission.',
+   sum:'<ul><li>Jedes Unternehmen, das Belege elektronisch aufbewahrt, braucht eine Verfahrensdokumentation, egal wie klein.</li><li>Sie beschreibt, wie Belege entstehen und ankommen, wie sie verarbeitet, gespeichert und wiedergefunden werden, welche Programme im Einsatz sind, wer Zugriff hat und wie Daten gesichert werden.</li><li>Änderungen werden mit Datum festgehalten. Die Dokumentation wird so lange aufbewahrt wie die Belege selbst.</li><li>Fehlt sie, ist das nicht automatisch ein Verstoß. Das Finanzamt darf aber schätzen, wenn sich etwas nicht nachvollziehen lässt.</li><li>Seit Juli 2025 genügt es, bei E-Rechnungen den Datensatz aufzubewahren, ein zusätzliches Bild ist nicht nötig.</li></ul>'}],
  a:['Die eigene Verfahrensdokumentation in fünf Sätzen schreiben']},
 {s:2,t:'Plötzlich XML',min:45,
  r:'Die nächste Nordwind-Rechnung kommt als .xml-Datei. Musst du sie annehmen? Ab wann muss Nordwind so schicken?',
  l:'Ja, annehmen musst du seit 2025. Ausstellen muss Nordwind ab 2027, wenn der Umsatz 2026 über 800.000 € lag, sonst ab 2028.',
- read:[['Merkblatt IHK Rhein-Neckar',U.ihkrn],['Übergangsfristen IHK Koblenz',U.ihkko]],
- k:'<table><tr><th>Ab</th><th>Was gilt</th></tr><tr><td>1.1.2025</td><td>Alle müssen E-Rechnungen empfangen können</td></tr><tr><td>1.1.2027</td><td>Ausstellen bei mehr als 800.000 € Umsatz in 2026</td></tr><tr><td>1.1.2028</td><td>Ausstellen für alle übrigen</td></tr></table><p>Kleinunternehmer müssen nicht ausstellen, aber empfangen. Rechnungen an Privatleute sind ausgenommen.</p>',
+ texte:[
+  {t:'Die Fristen in Kürze',src:'Kurs',sum:'<table><tr><th>Ab</th><th>Was gilt</th></tr><tr><td>1.1.2025</td><td>Alle Unternehmen müssen E-Rechnungen empfangen können</td></tr><tr><td>1.1.2027</td><td>Ausstellen ist Pflicht bei mehr als 800.000 € Umsatz in 2026</td></tr><tr><td>1.1.2028</td><td>Ausstellen ist Pflicht für alle übrigen</td></tr></table>'},
+  {t:'E-Rechnungspflicht für B2B-Umsätze',src:'IHK Rhein-Neckar, Merkblatt',u:U.ihkrn,
+   sum:'<ul><li>Eine E-Rechnung ist strukturiert und folgt der Norm EN 16931. PDF- oder Word-Dateien sind sonstige Rechnungen.</li><li>Betroffen sind Unternehmen in Deutschland, die an andere Unternehmen in Deutschland liefern.</li><li>Kleinbetragsrechnungen bis 250 € und Fahrkarten sind ausgenommen.</li><li>Kleinunternehmer müssen nie E-Rechnungen ausstellen, empfangen müssen sie aber auch.</li><li>Empfänger brauchen eine lesbare Ansicht, etwa über den kostenlosen ELSTER-Viewer, und archivieren die XML-Datei unverändert.</li></ul>',
+   warn:'Im Merkblatt widersprechen sich Text und Tabelle bei den Regeln für 2027. Verlass dich bei den Fristen auf die IHK Koblenz.'},
+  {t:'Die E-Rechnung kommt',src:'IHK Koblenz, Stand Ende 2026',u:U.ihkko,empf:true,why:'Die Seite ist auf dem neuesten Stand und erklärt das BMF-Schreiben vom Oktober 2026. Die Tabelle der Übergangsfristen solltest du einmal im Original gesehen haben.',
+   sum:'<ul><li>PDFs, Bilder und Scans sind keine E-Rechnungen. Bei ZUGFeRD zählt nur der strukturierte Teil.</li><li>Sonstige Rechnungen sind 2025 und 2026 mit Zustimmung des Empfängers erlaubt, 2027 nur noch bei höchstens 800.000 € Vorjahresumsatz, ab 2028 gar nicht mehr.</li><li>Für den Empfang reicht meist ein E-Mail-Postfach. Der ELSTER-Viewer zeigt XRechnung und ZUGFeRD kostenlos an.</li><li>Laut BMF-Schreiben vom Oktober 2026 macht ein technischer Formfehler eine E-Rechnung nicht automatisch ungültig, entscheidend sind die Pflichtangaben. Die Leistungsbeschreibung muss in den strukturierten Daten stehen, nicht nur im PDF.</li></ul>'}],
  a:['Klären, wie E-Rechnungen bei dir ankommen und wer sie öffnen kann']},
 {s:2,t:'Sortierstunde',min:30,
  r:'Vier Rechnungen: PDF per Mail vom Stromanbieter, XRechnung von Nordwind, ZUGFeRD-Datei vom Großhandel, Papierrechnung vom Handwerker. Welche sind E-Rechnungen?',
  l:'Die XRechnung und die ZUGFeRD-Datei, sofern ihr Profil gültig ist. PDF und Papier sind sonstige Rechnungen.',
- read:[['E-Rechnung bei Haufe',U.haufe]],
- k:'<p>E-Rechnung heißt strukturierter Datensatz nach EN 16931, also XRechnung oder ZUGFeRD. Eine normale PDF ist seit 2025 eine sonstige Rechnung.</p>',
+ texte:[
+  {t:'E-Rechnung: Pflicht, Formate, Fristen',src:'Haufe, kurzer Artikel, etwa 4 Minuten',u:U.haufe,
+   sum:'<ul><li>E-Rechnung heißt: strukturiertes Format, das eine Software ohne Abtippen verarbeiten kann, meist eine XML-Datei.</li><li>Eine PDF zeigt nur an und gilt als sonstige Rechnung, ebenso Scans und Fotos. Eine E-Mail mit PDF-Anhang ist also keine E-Rechnung.</li><li>Zulässig sind XRechnung (reine XML) und ZUGFeRD ab Version 2.0.1 (PDF mit XML).</li><li>Dauerhaft ausgenommen sind Rechnungen an Privatleute, Kleinbetragsrechnungen bis 250 €, Fahrkarten, Kleinunternehmer und bestimmte steuerfreie Umsätze.</li></ul>'}],
  a:['Die letzten zehn Firmenrechnungen in E-Rechnung, PDF und Papier sortieren']},
 {s:3,t:'Blick unter die Haube',min:60,
  r:'In der Nordwind-XML steht irgendwo 2026-0417. Woran erkennt eine Software, dass das die Rechnungsnummer ist?',
  l:'Am Feld, in dem der Wert steht. Die Rechnungsnummer steht immer in BT-1.',
- read:[['XRechnung im Mittelstand, Agicap',U.agicap],['Muster mit markierten Feldern, experte.de',U.experte]],
- k:'<p>Jedes Feld hat eine Kennung, den Business Term (BT). Zusammengehörige Felder bilden eine Business Group (BG). Zwei Schreibweisen: UBL und CII.</p><table><tr><th>Feld</th><th>Inhalt</th></tr><tr><td>BT-1</td><td>Rechnungsnummer</td></tr><tr><td>BT-2</td><td>Rechnungsdatum</td></tr><tr><td>BT-9</td><td>Fälligkeitsdatum</td></tr><tr><td>BT-10</td><td>Käuferreferenz</td></tr><tr><td>BT-24</td><td>Spezifikationskennung (Profil)</td></tr><tr><td>BG-17</td><td>Bankverbindung</td></tr><tr><td>BT-109</td><td>Summe netto</td></tr><tr><td>BT-110</td><td>Umsatzsteuer gesamt</td></tr><tr><td>BT-112</td><td>Summe brutto</td></tr></table>',
+ texte:[
+  {t:'Wie eine E-Rechnung aufgebaut ist',src:'Kurs, Lesetext',empf:true,why:'Dieser Text deckt die Testfragen zu BT-Feldern ab. Lies ihn ganz, mit dem XML-Beispiel.',
+   sum:'<p>Die Norm EN 16931 gibt jedem Rechnungsfeld eine feste Nummer, den Business Term (BT). BT-1 ist immer die Rechnungsnummer, BT-2 das Datum, BT-112 die Bruttosumme. Zusammengehörige Felder bilden eine Business Group (BG). Die XML gibt es in zwei Schreibweisen, UBL und CII, mit gleichem Inhalt.</p>',
+   full:`<p>Auf einer Papierrechnung findet ein Mensch die Rechnungsnummer, weil er weiß, wie eine Rechnung aussieht. Eine Software weiß das nicht. Sie braucht feste Plätze, an denen jede Angabe steht.</p>
+<p>Diese Plätze legt die europäische Norm EN 16931 fest. Sie beschreibt, welche Angaben eine Rechnung enthalten kann, und gibt jedem Feld eine feste Nummer. So eine Nummer heißt Business Term, kurz BT. Die Rechnungsnummer steht immer in BT-1, das Rechnungsdatum in BT-2, das Fälligkeitsdatum in BT-9, die Summe ohne Steuer in BT-109 und die Summe mit Steuer in BT-112. Egal welcher Lieferant die Rechnung schickt und mit welchem Programm: BT-1 ist immer die Rechnungsnummer.</p>
+<p>Manche Angaben gehören zusammen, zum Beispiel alle Daten für die Überweisung. Solche Gruppen heißen Business Group, kurz BG. Die Bankverbindung ist BG-17, darin liegen die Felder BT-84 bis BT-86. Was in kein Feld passt, kommt als Freitext in BT-22.</p>
+<p>Technisch ist eine E-Rechnung eine XML-Datei. XML ist reiner Text, in dem jeder Wert zwischen zwei Markierungen steht. Ein Ausschnitt der Nordwind-Rechnung könnte so aussehen (Datum erfunden):</p>
+<pre>&lt;cbc:ID&gt;2026-0417&lt;/cbc:ID&gt;
+&lt;cbc:IssueDate&gt;2026-11-16&lt;/cbc:IssueDate&gt;
+&lt;cbc:TaxExclusiveAmount currencyID="EUR"&gt;1200.00&lt;/cbc:TaxExclusiveAmount&gt;
+&lt;cbc:TaxInclusiveAmount currencyID="EUR"&gt;1428.00&lt;/cbc:TaxInclusiveAmount&gt;</pre>
+<p>Die erste Zeile ist BT-1, die zweite BT-2, dann BT-109 und BT-112. Die Spezifikation der Norm enthält eine Tabelle, die jeder BT-Nummer ihre Markierung in der XML zuordnet.</p>
+<p>Die Norm erlaubt zwei Schreibweisen für die XML: UBL und CII. Der Inhalt ist derselbe, nur die Markierungen heißen anders. Der Ausschnitt oben ist UBL. Für dich als Empfänger ist das egal, ein Viewer oder deine Buchhaltungssoftware liest beide.</p>`},
+  {t:'XRechnung im Mittelstand',src:'Agicap, Blogartikel',u:U.agicap,
+   sum:'<ul><li>Die XRechnung ist die deutsche Fassung der Norm, eine reine XML-Datei ohne Bild. Sie wird von der KoSIT betreut.</li><li>Die deutschen Zusatzregeln heißen CIUS, die Erweiterungen um zusätzliche Angaben Extension.</li><li>Seit Version 3.0 sind auch Geschäftsprozess und die elektronischen Adressen von Verkäufer und Käufer Pflicht (BT-23, BT-34, BT-49).</li><li>In BT-10 steht bei Rechnungen an Behörden die Leitweg-ID, zwischen Firmen reicht ein Platzhalter.</li><li>Version 3.0 gilt mindestens bis Ende Juli 2027. Von Version 4.0 gibt es seit September 2026 eine Vorversion, das fertige Paket ist für Frühjahr 2027 angekündigt.</li></ul>'},
+  {t:'E-Rechnung Beispiel',src:'experte.de, mit Muster der Bundesagentur für Arbeit',u:U.experte,empf:true,why:'Das Wichtigste ist hier ein Bild: eine echte Musterrechnung, an der jedes Feld mit seiner BT-Nummer markiert ist. Das lässt sich nicht zusammenfassen, schau es dir an.',
+   sum:'<ul><li>Der Artikel zeigt eine XRechnung und eine ZUGFeRD-Rechnung als Bild.</li><li>Eine große Tabelle listet die Pflichtfelder mit BT-Nummer, etwa BT-1 Rechnungsnummer, BT-31 USt-ID, BT-84 IBAN, BT-112 Bruttosumme, BT-153 Artikelname.</li><li>Manche Felder sind nur in bestimmten Fällen Pflicht, zum Beispiel bei abweichendem Zahlungsempfänger.</li><li>Der Artikel enthält Werbung für Rechnungsprogramme.</li></ul>'}],
  a:['Jeder Angabe der Nordwind-Rechnung ihr BT-Feld zuordnen']},
 {s:3,t:'Welches Profil?',min:30,
  r:'Der Großhandel schickt ZUGFeRD im Profil BASIC WL. Ist das eine gültige E-Rechnung?',
  l:'Nein, BASIC WL enthält keine Rechnungspositionen und gilt nicht als E-Rechnung.',
- read:[['Profile im Überblick, Lexware',U.lexprof],['ZUGFeRD-Leitfaden, Lido',U.lidoz]],
- k:'<table><tr><th>Profil</th><th>Gültig</th></tr><tr><td>MINIMUM</td><td>nein</td></tr><tr><td>BASIC WL</td><td>nein</td></tr><tr><td>BASIC</td><td>umstritten</td></tr><tr><td>EN 16931</td><td>ja, empfohlen</td></tr><tr><td>EXTENDED</td><td>ja</td></tr><tr><td>XRECHNUNG</td><td>ja</td></tr></table><p>Aktuell: ZUGFeRD 2.5, gültig seit 1. Juli 2026.</p>',
+ texte:[
+  {t:'XRechnung, ZUGFeRD und die Profile',src:'Kurs, Lesetext',empf:true,why:'Dieser Text deckt die Testfragen zu den Formaten und Profilen ab. Lies ihn ganz.',
+   sum:'<p>Die XRechnung ist eine reine XML-Datei. ZUGFeRD ist ein PDF mit eingebetteter XML, rechtlich zählt die XML. Ein ZUGFeRD-Profil legt fest, wie viele Angaben in der XML stehen. MINIMUM und BASIC WL fehlen die Positionen, sie sind keine gültige E-Rechnung. Sicher ist EN 16931.</p>',
+   full:`<p>In Deutschland sind zwei Formate üblich, die beide auf der Norm EN 16931 beruhen.</p>
+<p>Die XRechnung ist eine reine XML-Datei ohne Bild. Öffnet man sie ohne passendes Programm, sieht man nur Text mit Markierungen. Sie ist die deutsche Fassung der Norm und ergänzt sie um eigene Regeln. Behörden verlangen sie meistens.</p>
+<p>ZUGFeRD ist ein PDF, in das eine XML-Datei eingebettet ist. Ein Mensch öffnet es wie jedes PDF und sieht eine normale Rechnung. Die Buchhaltungssoftware liest dagegen die eingebettete XML. Man nennt das ein hybrides Format. Rechtlich zählt nur der strukturierte Teil, also die XML. Deshalb lohnt es sich zu prüfen, ob beides übereinstimmt.</p>
+<p>ZUGFeRD gibt es in mehreren Profilen. Ein Profil legt fest, wie viele Angaben in der XML stehen:</p>
+<ul><li>MINIMUM enthält nur wenige Kopfdaten und die Summen.</li>
+<li>BASIC WL enthält Kopfdaten, aber keine Rechnungspositionen. WL steht für „without lines“, also ohne Zeilen.</li>
+<li>BASIC enthält die Grunddaten mit Positionen.</li>
+<li>EN 16931, früher COMFORT genannt, enthält den vollständigen Datensatz der Norm.</li>
+<li>EXTENDED enthält zusätzliche Felder für komplizierte Fälle.</li>
+<li>XRECHNUNG bildet die Regeln der XRechnung im ZUGFeRD-Format ab.</li></ul>
+<p>Als E-Rechnung zählen nur Profile mit vollständigen Rechnungsangaben. MINIMUM und BASIC WL fehlen die Positionen, deshalb sind sie keine gültige E-Rechnung. Bei BASIC sind sich die Quellen nicht einig. Wer auf Nummer sicher gehen will, verlangt EN 16931.</p>
+<p>Welches Profil eine Datei hat, steht in BT-24, der Spezifikationskennung. Die aktuelle Version ist ZUGFeRD 2.5, gültig seit Juli 2026. Im August 2026 kam die Korrekturfassung 2.5.2 heraus.</p>`},
+  {t:'ZUGFeRD und XRechnung im Überblick',src:'Lexware, Ratgeber',u:U.lexprof,
+   sum:'<ul><li>ZUGFeRD ist ein lesbares PDF/A-3 mit eingebetteter XML.</li><li>Ab Version 2.0.1 zählt ZUGFeRD als E-Rechnung, wenn das Profil passt.</li><li>Gültig: BASIC, EN 16931, EXTENDED, XRECHNUNG. Nicht gültig: MINIMUM und BASIC WL.</li><li>Version 1.0 von 2014 entspricht der Norm noch nicht.</li></ul>'},
+],
  a:['Notieren, welches Profil du von Lieferanten verlangen würdest']},
 {s:3,t:'Selbst ausprobieren',min:60,
  r:'Kannst du eine echte E-Rechnung öffnen, prüfen und richtig ablegen, ohne nachzuschlagen?',
  l:'Wenn alle vier Aufgaben unten abgehakt sind: ja.',
- read:[['ZUGFeRD-Spezifikation mit Beispieldateien beim FeRD',U.ferd]],
- k:'<p>Zum Anschauen eignet sich ein Viewer, zum Beispiel das kostenlose Programm Quba.</p>',
+ texte:[
+  {t:'ZUGFeRD beim FeRD',src:'Forum elektronische Rechnung Deutschland',u:U.ferd,
+   sum:'<ul><li>Unter „Standards und FAQs“, dann „ZUGFeRD/Factur-X“ gibt es die Spezifikation zum Herunterladen.</li><li>Unter „ZUGFeRD-Beispielrechnungen“ findest du fertige Beispieldateien zum Ausprobieren.</li><li>Neueste Fassung ist ZUGFeRD 2.5.2 vom August 2026.</li></ul>'},
+  {t:'Womit du E-Rechnungen öffnest',src:'Kurs',sum:'<p>Die Finanzverwaltung bietet in ELSTER einen kostenlosen Viewer an, der XRechnung und ZUGFeRD lesbar anzeigt und prüft. Erstellen kann er keine Rechnungen.</p>'}],
  a:['Beispieldatei im Viewer öffnen und die Pflichtangaben suchen','Bei einer ZUGFeRD-Datei das Profil in BT-24 nachsehen','Prüfen, ob PDF-Ansicht und XML übereinstimmen','Die Datei im Original ablegen']},
 {s:3,t:'Dein eigener Workflow',min:60,
  r:'Nordwind wird Stammlieferant. Wie soll jede ihrer Rechnungen künftig bei dir laufen?',
  l:'Deine eigene Antwort ist das Abschlussprojekt.',
- read:[['Anleitung d.velop smart invoice',U.dvelop],['Webinar „E-Rechnung 2027“ der IHK Düsseldorf am 8.12.2026',U.ihkdus]],
- k:'<p>Bearbeiterfindung, Freigabematrix und Vier-Augen-Prinzip sind die Bausteine, mit denen Software wie d.velop smart invoice deinen Ablauf abbildet.</p>',
+ texte:[
+  {t:'Wer bekommt die Aufgabe? Bearbeiterfindung',src:'Kurs, Lesetext',empf:true,why:'Dieser Text deckt die Testfrage zur Bearbeiterfindung ab. Lies ihn ganz.',
+   sum:'<p>Die Bearbeiterfindung ist eine Bedingung, die für jeden Benutzer und jede Gruppe geprüft wird. Wer sie erfüllt, ist ein Treffer. Bei „Alle Treffer verwenden“ bekommen alle die Aufgabe, und wer zuerst abschließt, beendet sie für alle. Bei „Auswahl anbieten“ wählt die Person im vorigen Schritt aus.</p>',
+   full:`<p>In einer Software wie d.velop smart invoice läuft jede Rechnung durch Schritte: Verteilung, Prüfung, Freigabe, Buchhaltung. Bei jedem Schritt muss die Software wissen, wer die Aufgabe bekommt. Das regelt die Bearbeiterfindung.</p>
+<p>Eine Bearbeiterfindung ist eine Bedingung. Die Software prüft sie für jeden Benutzer und jede Gruppe. Wer die Bedingung erfüllt, ist ein Treffer und kommt als Bearbeiter in Frage. Ein einfaches Beispiel für den Schritt Freigabe: <code>user.name = "Geschäftsführung"</code>. Dann bekommt die Gruppe Geschäftsführung die Aufgabe.</p>
+<p>Oft passen mehrere Treffer, etwa wenn die Bedingung zwei Gruppen nennt. Dann entscheidet eine von zwei Einstellungen, was passiert:</p>
+<ul><li><b>Alle Treffer verwenden:</b> Alle Treffer bekommen die Aufgabe gleichzeitig. Sobald einer von ihnen sie abschließt, verschwindet sie bei allen anderen. Das passt, wenn es egal ist, wer sich kümmert, Hauptsache schnell.</li>
+<li><b>Auswahl anbieten:</b> Die Person im vorigen Schritt sieht die Treffer und wählt aus, wer die Aufgabe bekommt. Das passt, wenn jemand bewusst entscheiden soll, wer zuständig ist.</li></ul>
+<p>Für die sachliche Prüfung gibt es eine besondere Bedingung: <code>user.name IN voucher.outstanding_verifiers</code>. Sie trifft alle Prüfer, die bei dieser Rechnung noch nicht geprüft haben.</p>
+<p>Das Vier-Augen-Prinzip ergänzt die Bearbeiterfindung bei der Freigabe. Bei Beträgen über 10.000 € verlangt die Software eine zweite Person, auch wenn eigentlich eine reichen würde. Wer die Rechnung sachlich geprüft hat, darf sie nicht selbst freigeben.</p>
+<p>Ein Tipp aus der Praxis: Trag in Bearbeiterfindungen Gruppen ein, nicht einzelne Personen. Wechselt jemand die Stelle, änderst du nur die Gruppe und nicht den ganzen Ablauf.</p>`},
+  {t:'Anleitung zu d.velop smart invoice',src:'Deine Dokumentation',u:U.dvelop,
+   sum:'<ul><li>Der Onboarding-Assistent legt einen Ablauf mit Verteilung, Prüfung, Freigabe und Buchhaltung an.</li><li>Freigaben gehen einfach über eine Gruppe oder über eine Freigabematrix mit Kostenstellen und Betragsgrenzen.</li><li>Die Anleitung enthält eine Checkliste für den Test vor dem Echtbetrieb und offene Fragen, die jeder Betrieb selbst klären muss.</li></ul>'},
+  {t:'Webinar „E-Rechnung 2027: Jetzt wird’s ernst – und effizient“',src:'IHK Düsseldorf, 8. Dezember 2026, 10:30 bis 12:00 Uhr',u:U.ihkdus,opt:true,
+   sum:'<p>Kostenloses Webinar mit Anmeldung, Referent ist ein Steuerberater. Themen sind die Rechtslage, die Fristen und die digitale Rechnungsverarbeitung. Die Seite rät, früh zu planen, den Rechnungseingang neu zu ordnen und den kostenlosen ELSTER-Viewer zu nutzen.</p>'}],
  a:['Den Ablauf von Eingang bis Archiv mit Namen an jeder Station zeichnen','Freigaberegeln festlegen: wer, bis zu welchem Betrag, wer vertritt','Die Verfahrensdokumentation um E-Rechnungen ergänzen']}
 ].map((m,i)=>({...m,id:'m'+(i+1),n:i+1}));
 
@@ -263,34 +360,42 @@ const C=[
  ['Wer korrigiert eine fehlerhafte Rechnung?','Der Lieferant, mit einer neuen Rechnung'],
  ['Wie lange werden Rechnungen aufbewahrt?','Acht Jahre (seit 2025)'],
  ['Die GoBD-Grundsätze für Belege?','Nachvollziehbar, vollständig, richtig, zeitgerecht, geordnet, unverändert'],
+ ['Darf das Papier nach dem Scannen weg?','Ja, wenn der Scan inhaltlich übereinstimmt und lesbar bleibt. Ausnahmen sind z. B. Jahresabschlüsse und amtliche Urkunden'],
  ['Was beschreibt die Verfahrensdokumentation?','Wie Belege ankommen, wer sie bearbeitet, wo sie landen und wer Zugriff hat'],
  ['Seit wann müssen alle Unternehmen E-Rechnungen empfangen können?','Seit 1. Januar 2025'],
  ['Wer muss ab 1.1.2027 E-Rechnungen ausstellen?','Unternehmen mit mehr als 800.000 € Umsatz in 2026'],
  ['Ab wann müssen alle übrigen Unternehmen E-Rechnungen ausstellen?','Ab 1. Januar 2028'],
  ['Gilt die E-Rechnungspflicht für Rechnungen an Privatleute?','Nein, nur zwischen Unternehmen'],
  ['Kleinunternehmer und E-Rechnung?','Ausstellen müssen sie nicht, empfangen schon'],
+ ['Womit kann man E-Rechnungen kostenlos ansehen?','Mit dem Viewer in ELSTER'],
  ['Auf welcher Norm beruhen XRechnung und ZUGFeRD?','EN 16931'],
  ['Was ist ein Business Term (BT)?','Die genormte Kennung eines Rechnungsfelds'],
  ['Was steht in BT-1, BT-2 und BT-112?','Rechnungsnummer, Rechnungsdatum, Summe brutto'],
  ['Die zwei Syntaxen der EN 16931?','UBL und CII'],
+ ['Was zählt rechtlich bei ZUGFeRD, PDF oder XML?','Die XML, also der strukturierte Teil'],
  ['Welches ZUGFeRD-Profil wird empfohlen?','EN 16931 (früher COMFORT)'],
  ['Welche ZUGFeRD-Profile gelten nicht als E-Rechnung?','MINIMUM und BASIC WL'],
- ['Aktuelle ZUGFeRD-Version?','ZUGFeRD 2.5, gültig seit 1. Juli 2026'],
  ['Ab welchem Betrag verlangt d.velop smart invoice beim Vier-Augen-Prinzip eine zweite Person?','Über 10.000 €'],
  ['Wer ist beim Vier-Augen-Prinzip von der Freigabe ausgeschlossen?','Wer die sachliche Prüfung gemacht hat']];
 
 /* ---------- Zustand ---------- */
 const KEY='reise-der-rechnung-v1';
-let S={done:{},tasks:{},tests:{},known:[],order:[]};
+const blank=()=>({done:{},tasks:{},tests:{},known:[],order:[],read:{},ans:{},sol:{}});
+let S=blank();
 try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x)S={...S,...x}}catch(e){}
 let dbRef=null,saving=false,again=false,timer=null;
-const merge=o=>{if(!o)return;S.done={...o.done,...S.done};S.tasks={...o.tasks,...S.tasks};
+const merge=o=>{if(!o)return;for(const k of ['done','tasks','read','sol'])S[k]={...(o[k]||{}),...S[k]};S.ans={...(o.ans||{}),...S.ans};
  for(const k in o.tests||{})S.tests[k]=Math.max(S.tests[k]||0,o.tests[k]);
  S.known=[...new Set([...(o.known||[]),...S.known])];if(!S.order.length&&o.order)S.order=o.order};
 async function flush(){if(!dbRef)return;if(saving){again=true;return}saving=true;
  try{await dbRef.set(JSON.parse(JSON.stringify(S)))}catch(e){}saving=false;if(again){again=false;flush()}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(timer);timer=setTimeout(flush,800)}
 
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const req=m=>m.texte.map((t,i)=>({t,k:m.id+'-'+i})).filter(x=>!x.t.opt);
+const readDone=m=>req(m).every(x=>S.read[x.k]);
+const unlocked=m=>m.n===1||S.done[m.id]||S.done['m'+(m.n-1)];
+const stufeRead=n=>M.filter(m=>m.s===n).every(readDone);
 const stufeDone=n=>M.filter(m=>m.s===n).every(m=>S.done[m.id])&&(S.tests[n]||0)>=3;
 
 /* ---------- Bild ---------- */
@@ -320,49 +425,80 @@ function drawPic(){
 
 /* ---------- Missionen ---------- */
 const vm=document.getElementById('v-missionen');
-const HOWTO=`<div class="howto"><h2>So geht's</h2><ol>
-<li><b>Mission aufklappen.</b> Tippe unten auf eine Mission. Fang mit Mission 1 an, sie ist schon geöffnet.</li>
-<li><b>Rätsel lösen.</b> Im roten Kasten steht eine Frage. Überleg dir zuerst selbst eine Antwort. Wenn du nicht weiterkommst, lies die Links unter „Zum Lösen lesen“.</li>
-<li><b>Lösung prüfen.</b> Tippe auf „Lösung zeigen“ und vergleiche sie mit deiner Antwort.</li>
-<li><b>Aufgabe erledigen.</b> Unter „Ergebnis“ steht eine kleine Aufgabe für deinen eigenen Betrieb. Hake sie ab, wenn du sie gemacht hast.</li>
-<li><b>Mission abschließen.</b> Tippe auf „Mission erledigt“. Die Spur oben füllt sich, und die nächste Mission geht auf.</li>
-<li><b>Stempel holen.</b> Nach vier Missionen machst du den Stufentest. Mit drei richtigen Antworten bekommt die Rechnung oben ihren Stempel.</li></ol>
-<p class="muted">Die Karteikarten kannst du jederzeit zwischendurch durchgehen, zum Beispiel unterwegs auf dem Handy.</p></div>`;
+const HOWTO=`<div class="howto"><h2>So geht's</h2><p>Jede Mission hat drei Schritte. Der nächste Schritt öffnet sich erst, wenn der vorige erledigt ist.</p><ol>
+<li><b>Lesen.</b> Zu jedem Text gibt es eine Zusammenfassung. Meist reicht sie. Wo ein rotes Schild „Ganzen Text lesen empfohlen“ steht, lies den ganzen Text. Hake jeden Text mit „Gelesen“ ab. Texte mit dem Schild „freiwillig“ musst du nicht lesen.</li>
+<li><b>Rätsel beantworten.</b> Schreib deine Antwort in das Feld. Danach siehst du die Lösung zum Vergleichen.</li>
+<li><b>Ergebnis.</b> Erledige die kleine Aufgabe für deinen eigenen Betrieb und tippe auf „Mission erledigt“. Dann öffnet sich die nächste Mission.</li></ol>
+<p class="muted">Der Stufentest öffnet sich, sobald du alle Texte der vier Missionen einer Stufe gelesen hast. Mit drei richtigen Antworten und allen vier Missionen bekommt die Rechnung oben ihren Stempel.</p></div>`;
 const curId=()=>(M.find(m=>!S.done[m.id])||{}).id;
+function textCard(m,t,i){
+ const k=m.id+'-'+i,rd=S.read[k];
+ return `<div class="txt ${rd?'isread':''}">
+  <div class="txthead"><b>${t.t}</b>${t.empf?'<span class="empf">Ganzen Text lesen empfohlen</span>':''}${t.opt?'<span class="opt">freiwillig</span>':''}</div>
+  <div class="src">${t.src}</div>
+  ${t.empf&&t.why?`<p class="why2">${t.why}</p>`:''}
+  <div class="sum"><small>${t.full||t.u?'Zusammenfassung':'Text'}</small>${t.sum}</div>
+  ${t.warn?`<div class="warnbox">Achtung: ${t.warn}</div>`:''}
+  ${t.full?`<details class="full" ${t.empf&&!rd?'open':''}><summary>Ganzen Text lesen</summary>${t.full}</details>`:''}
+  <div class="row">${t.u?`<a class="btn" href="${t.u}" target="_blank" rel="noopener">Ganzen Text öffnen</a>`:''}
+   ${t.opt?'':`<button class="btn ${rd?'okb':'main'}" data-read="${k}">${rd?'Gelesen':'Als gelesen markieren'}</button>`}</div>
+ </div>`;
+}
+function missionBody(m){
+ const rd=readDone(m),sol=S.sol[m.id],d=S.done[m.id];
+ const left=req(m).filter(x=>!S.read[x.k]).length;
+ return `<div class="body">
+  <div class="step"><h3>Schritt 1: Lesen</h3><p class="hint0">${rd?'Alle Texte gelesen.':`Noch ${left} ${left===1?'Text':'Texte'} zu lesen.`}</p>
+   ${m.texte.map((t,i)=>textCard(m,t,i)).join('')}</div>
+  <div class="step ${rd?'':'locked'}"><h3>Schritt 2: Rätsel beantworten</h3><p class="lockmsg">Öffnet sich, wenn alle Texte in Schritt 1 als gelesen markiert sind.</p>
+   <div class="raetsel"><b>Rätsel</b>${m.r}</div>
+   ${sol?`<div class="mine"><small>Deine Antwort</small>${esc(S.ans[m.id]||'')}</div><div class="loes"><small>Lösung</small>${m.l}</div><div class="row"><button class="btn" data-redo="${m.id}">Antwort ändern</button></div>`:
+   `<label for="a-${m.id}" class="muted">Deine Antwort</label><textarea id="a-${m.id}" data-ans="${m.id}" placeholder="Schreib hier deine Antwort, ein paar Wörter reichen.">${esc(S.ans[m.id]||'')}</textarea>
+   <div class="row"><button class="btn main" data-give="${m.id}">Antwort abgeben und Lösung zeigen</button></div>`}</div>
+  <div class="step ${sol?'':'locked'}"><h3>Schritt 3: Ergebnis</h3><p class="lockmsg">Öffnet sich, wenn du das Rätsel beantwortet hast.</p>
+   ${m.a.map((t,i)=>{const k=m.id+'-'+i;return `<label class="task"><input type="checkbox" data-task="${k}" ${S.tasks[k]?'checked':''}><span>${t}</span></label>`}).join('')}
+   <div class="row"><button class="btn ${d?'':'main'}" data-done="${m.id}">${d?'Wieder öffnen':'Mission erledigt'}</button></div></div>
+ </div>`;
+}
 function renderMissions(){
- const open=new Set([...vm.querySelectorAll('details[open]')].map(d=>d.dataset.id));
+ const open=new Set([...vm.querySelectorAll('details.m[open]')].map(d=>d.dataset.id));
  const cur=curId();if(!vm.dataset.init&&cur)open.add(cur);vm.dataset.init=1;
  vm.innerHTML=HOWTO+STUFEN.map(st=>{
   const ms=M.filter(m=>m.s===st.n),dn=ms.filter(m=>S.done[m.id]).length;
   return `<div class="stufe"><header><h2>Stufe ${st.n}: ${st.name}</h2><span class="badge ${stufeDone(st.n)?'ok':''}">${stufeDone(st.n)?'Stempel erhalten':dn+' von 4 erledigt'}</span><p>${st.text}</p></header>
-  ${ms.map(m=>{const d=S.done[m.id];return `<details class="m ${d?'done':''} ${m.id===cur?'cur':''}" data-id="${m.id}" ${open.has(m.id)?'open':''}>
-   <summary><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${m.min} Minuten</small></span><span class="badge ${d?'ok':''}">${d?'erledigt':m.id===cur?'als Nächstes':'offen'}</span></summary>
-   <div class="body">
-    <div class="raetsel"><b>Rätsel</b>${m.r}</div>
-    <div class="loes" id="l-${m.id}"><b>Lösung:</b> ${m.l}</div>
-    ${m.read.length?`<h4>Zum Lösen lesen</h4><ul>${m.read.map(([t,u])=>`<li>${L(t,u)}</li>`).join('')}</ul>`:''}
-    <h4>Das nimmst du mit</h4>${m.k}
-    <h4>Ergebnis</h4>${m.a.map((t,i)=>{const k=m.id+'-'+i;return `<label class="task"><input type="checkbox" data-task="${k}" ${S.tasks[k]?'checked':''}><span>${t}</span></label>`}).join('')}
-    <div class="row"><button class="btn" data-sol="${m.id}">Lösung zeigen</button><button class="btn ${d?'':'main'}" data-done="${m.id}">${d?'Wieder öffnen':'Mission erledigt'}</button></div>
-   </div></details>`}).join('')}
-  <div class="row"><button class="btn" data-gotest="${st.n}">Stufentest ${st.n} machen${S.tests[st.n]!=null?' (bisher '+S.tests[st.n]+' von 4)':''}</button></div></div>`}).join('');
+  ${ms.map(m=>{const d=S.done[m.id];
+   if(!unlocked(m))return `<div class="m locked"><div class="lockrow"><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>Öffnet sich nach Mission ${m.n-1}</small></span><span class="badge">gesperrt</span></div></div>`;
+   const stp=d?'erledigt':S.sol[m.id]?'Schritt 3':readDone(m)?'Schritt 2':'Schritt 1';
+   return `<details class="m ${d?'done':''} ${m.id===cur?'cur':''}" data-id="${m.id}" ${open.has(m.id)?'open':''}>
+   <summary><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${m.min} Minuten · ${stp}</small></span><span class="badge ${d?'ok':''}">${d?'erledigt':m.id===cur?'als Nächstes':'offen'}</span></summary>
+   ${missionBody(m)}</details>`}).join('')}
+  <div class="row"><button class="btn" data-gotest="${st.n}" ${stufeRead(st.n)?'':'disabled'}>Stufentest ${st.n}${stufeRead(st.n)?' machen':' (erst alle Texte lesen)'}${S.tests[st.n]!=null?' · bisher '+S.tests[st.n]+' von 4':''}</button></div></div>`}).join('');
 }
+function rerenderKeepScroll(){const y=scrollY;renderAll();scrollTo(0,y)}
 vm.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.sol){const el=document.getElementById('l-'+b.dataset.sol);el.classList.toggle('on');b.textContent=el.classList.contains('on')?'Lösung verbergen':'Lösung zeigen'}
- if(b.dataset.done){const id=b.dataset.done;S.done[id]=!S.done[id];if(!S.done[id])delete S.done[id];
-  save();if(S.done[id]){const d=vm.querySelector(`details[data-id="${id}"]`);if(d)d.open=false;const nx=curId();setTimeout(()=>{const n=vm.querySelector(`details[data-id="${nx}"]`);if(n)n.open=true},0)}renderAll()}
- if(b.dataset.gotest){show('tests');pickTest(+b.dataset.gotest)}
+ if(b.dataset.read){const k=b.dataset.read;if(S.read[k])delete S.read[k];else S.read[k]=true;save();rerenderKeepScroll()}
+ if(b.dataset.give){const id=b.dataset.give,ta=vm.querySelector(`textarea[data-ans="${id}"]`),v=(ta&&ta.value||'').trim();
+  if(v.length<2){ta.focus();ta.placeholder='Schreib zuerst eine Antwort, auch eine Vermutung zählt.';return}
+  S.ans[id]=v;S.sol[id]=true;save();rerenderKeepScroll()}
+ if(b.dataset.redo){delete S.sol[b.dataset.redo];save();rerenderKeepScroll()}
+ if(b.dataset.done){const id=b.dataset.done;if(S.done[id])delete S.done[id];else S.done[id]=true;save();
+  if(S.done[id]){const nx=curId();renderAll();const d=vm.querySelector(`details[data-id="${id}"]`);if(d)d.open=false;const n=vm.querySelector(`details[data-id="${nx}"]`);if(n){n.open=true;n.scrollIntoView({block:'start'});scrollBy(0,-60)}}else rerenderKeepScroll()}
+ if(b.dataset.gotest){show('tests');pickTest(+b.dataset.gotest);scrollTo(0,document.getElementById('v-tests').offsetTop-60)}
 });
+vm.addEventListener('input',e=>{const id=e.target.dataset.ans;if(id){S.ans[id]=e.target.value;save()}});
 vm.addEventListener('change',e=>{const k=e.target.dataset.task;if(!k)return;if(e.target.checked)S.tasks[k]=true;else delete S.tasks[k];save()});
 
 /* ---------- Tests ---------- */
 let curTest=1;
 const tp=document.getElementById('testPick'),tb=document.getElementById('testBox');
 function pickTest(n){curTest=n;renderTest()}
+const pickHtml=()=>STUFEN.map(s=>`<button class="btn" aria-pressed="${s.n===curTest}" data-t="${s.n}">Stufe ${s.n}: ${s.name}${S.tests[s.n]!=null?' · '+S.tests[s.n]+'/4':''}</button>`).join('');
 function renderTest(){
- tp.innerHTML=STUFEN.map(s=>`<button class="btn" aria-pressed="${s.n===curTest}" data-t="${s.n}">Stufe ${s.n}: ${s.name}${S.tests[s.n]!=null?' · '+S.tests[s.n]+'/4':''}</button>`).join('');
- tb.innerHTML=Q[curTest].map((q,i)=>`<div class="q" data-q="${i}"><p>${i+1}. ${q[0]}</p>${q[1].map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}<div class="why">${q[3]}</div></div>`).join('')+
+ tp.innerHTML=pickHtml();
+ if(!stufeRead(curTest)){const miss=M.filter(m=>m.s===curTest&&!readDone(m)).map(m=>m.n);
+  tb.innerHTML=`<div class="lockbox">Dieser Test öffnet sich, wenn du alle Texte der Stufe ${curTest} gelesen hast. Es fehlen noch Texte in ${miss.length===1?'Mission':'den Missionen'} ${miss.join(', ')}.</div>`;return}
+ tb.innerHTML=Q[curTest].map((q,i)=>`<div class="q" data-q="${i}"><p>${i+1}. ${q[0]}</p>${q[1].map((o,j)=>`<label class="optn"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}<div class="why">${q[3]}</div></div>`).join('')+
  `<div class="result" id="res"></div><div class="row"><button class="btn main" id="check">Auswerten</button><button class="btn" id="again">Neu versuchen</button></div>`;
 }
 tp.addEventListener('click',e=>{const b=e.target.closest('button');if(b)pickTest(+b.dataset.t)});
@@ -371,19 +507,19 @@ tb.addEventListener('click',e=>{
  if(e.target.id!=='check')return;
  let ok=0,miss=0;Q[curTest].forEach((q,i)=>{const box=tb.querySelector(`[data-q="${i}"]`),sel=box.querySelector('input:checked');
   if(!sel){miss++;return}box.classList.add('checked');
-  box.querySelectorAll('.opt').forEach((o,j)=>{o.classList.toggle('right',j===q[2]);o.classList.toggle('wrong',j===+sel.value&&j!==q[2])});
+  box.querySelectorAll('.optn').forEach((o,j)=>{o.classList.toggle('right',j===q[2]);o.classList.toggle('wrong',j===+sel.value&&j!==q[2])});
   if(+sel.value===q[2])ok++});
  const r=document.getElementById('res');
  if(miss){r.textContent=`Noch ${miss} ${miss===1?'Frage':'Fragen'} offen.`;return}
  S.tests[curTest]=Math.max(S.tests[curTest]||0,ok);save();
  const ms=M.filter(m=>m.s===curTest&&!S.done[m.id]).length;
  r.textContent=`${ok} von 4 richtig. `+(ok>=3?(ms?`Bestanden. Für den Stempel fehlen noch ${ms} ${ms===1?'Mission':'Missionen'} dieser Stufe.`:'Bestanden, der Stempel ist deiner.'):'Für den Stempel braucht es drei richtige. Lies die Erklärungen und versuch es noch einmal.');
- renderTop();renderMissions();tp.innerHTML=STUFEN.map(s=>`<button class="btn" aria-pressed="${s.n===curTest}" data-t="${s.n}">Stufe ${s.n}: ${s.name}${S.tests[s.n]!=null?' · '+S.tests[s.n]+'/4':''}</button>`).join('');
+ renderTop();renderMissions();tp.innerHTML=pickHtml();
 });
 
 /* ---------- Karteikarten ---------- */
 const cb=document.getElementById('cardBox');
-function deck(){if(!S.order.length||S.order.length!==C.length)S.order=C.map((_,i)=>i);return S.order.filter(i=>!S.known.includes(i))}
+function deck(){if(S.order.length!==C.length)S.order=C.map((_,i)=>i);return S.order.filter(i=>!S.known.includes(i))}
 function renderCards(){
  const d=deck();
  if(!d.length){cb.innerHTML=`<p class="result">Alle ${C.length} Karten gewusst.</p><div class="row"><button class="btn main" id="cReset">Stapel neu mischen</button></div>`;return}
@@ -408,7 +544,8 @@ function renderTop(){
  document.getElementById('sCards').textContent=S.known.length;
  document.getElementById('pbar').style.width=(dn/12*100)+'%';
  const nx=M.find(m=>!S.done[m.id]);const open=[1,2,3].find(n=>!stufeDone(n));
- document.getElementById('next').innerHTML=nx?`<small>Als Nächstes</small>Mission ${nx.n}: ${nx.t} · ${nx.min} Minuten`:open?`<small>Als Nächstes</small>Stufentest ${open} bestehen`:`<small>Fertig</small>Alle Stempel gesammelt`;
+ const stp=nx?(S.sol[nx.id]?'Schritt 3: Ergebnis':readDone(nx)?'Schritt 2: Rätsel beantworten':'Schritt 1: Lesen'):'';
+ document.getElementById('next').innerHTML=nx?`<small>Als Nächstes</small>Mission ${nx.n}: ${nx.t} · ${stp}`:open?`<small>Als Nächstes</small>Stufentest ${open} bestehen`:`<small>Fertig</small>Alle Stempel gesammelt`;
  document.getElementById('cert').classList.toggle('on',stamps===3);
  drawPic();
 }
@@ -419,7 +556,7 @@ function show(v){document.querySelectorAll('.tab').forEach(t=>t.setAttribute('ar
 document.querySelector('nav.tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)show(t.dataset.v)});
 const rs=document.getElementById('reset');let armed=false;
 rs.addEventListener('click',()=>{if(!armed){armed=true;rs.textContent='Wirklich alles zurücksetzen?';setTimeout(()=>{armed=false;rs.textContent='Fortschritt zurücksetzen'},4000);return}
- S={done:{},tasks:{},tests:{},known:[],order:[]};armed=false;rs.textContent='Fortschritt zurücksetzen';save();vm.dataset.init='';renderAll();renderTest();renderCards()});
+ S=blank();armed=false;rs.textContent='Fortschritt zurücksetzen';save();vm.dataset.init='';renderAll();renderTest();renderCards()});
 
 renderAll();renderTest();
 
@@ -432,7 +569,7 @@ renderAll();renderTest();
   if(!db||!user)return;const id=await user.id();if(!id)return;
   dbRef=db.doc('data/users/'+id+'/progress');
   const snap=await dbRef.get();
-  if(snap.exists){merge(snap.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}renderAll()}
+  if(snap.exists){merge(snap.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}rerenderKeepScroll()}
   await flush();
   document.getElementById('saveNote').textContent='Dein Fortschritt wird in deinem Konto gespeichert und ist auf jedem Gerät da.';
  }catch(e){dbRef=null}
