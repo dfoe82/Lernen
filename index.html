@@ -2,683 +2,767 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Die Reise der Rechnung</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Sofia+Sans+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vokabeln">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2f6f6a">
+<title>Vokabeltrainer</title>
 <style>
-/*
-VOICE: ruhig, sachlich, ein bisschen Spiel. Wie ein Arbeitsheft, das man gern aufschlägt.
-IDEA: eine echte Papierrechnung, die Stempel bekommt, während man lernt.
-PICTURE: die Nordwind-Rechnung als Blatt mit drei Stempeln und darunter eine Spur aus 12 Stationen.
-COLOUR and TYPE: Weiß, Schwarz, Zinnober als Stempelfarbe. Sofia Sans Condensed für Titel, Instrument Sans für Text.
-LAYOUT: oben Titel und Fortschritt, daneben das Blatt; darunter Reiter; jede Mission in drei Schritten Lesen, Antworten, Ergebnis.
-*/
-:root{color-scheme:light dark;
---bg:light-dark(#ffffff,#120d0b);--ink:light-dark(#141210,#f3eeea);--soft:light-dark(#5d5853,#b6aca5);
---line:light-dark(#e4e0dc,#2f2724);--paper:light-dark(#fbf9f6,#1d1714);--red:light-dark(#e8401a,#ff6a43);
---redsoft:light-dark(#fde9e3,#3a1c13);--ok:light-dark(#1f7a4a,#5fcf8f);--oksoft:light-dark(#e3f3ea,#14301f);
---warn:light-dark(#8a5a00,#f0c062);--warnsoft:light-dark(#fbf0d9,#33270f)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-*{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Instrument Sans",system-ui,sans-serif;overflow-x:clip}
-h1,h2,h3{font-family:"Sofia Sans Condensed",system-ui,sans-serif;line-height:1.05;text-wrap:balance;margin:0}
-h1{font-size:clamp(34px,5vw,52px);font-weight:800}
-h2{font-size:32px;font-weight:800}
-h3{font-size:22px;font-weight:700}
-a{color:var(--red)}
-.wrap{max-width:1240px;margin:0 auto;padding:0 max(5vw,16px)}
-.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:center;padding-block:clamp(28px,4vw,56px)}
-.lead{font-size:17px;color:var(--soft);max-width:34em;margin:14px 0 22px}
-.stats{display:flex;flex-wrap:wrap;gap:12px 28px;margin-bottom:18px}
-.stat b{display:block;font-family:"Sofia Sans Condensed",sans-serif;font-size:40px;font-weight:800;line-height:1}
-.stat span{font-size:14px;color:var(--soft)}
-.bar{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--red);border-radius:6px;transition:width .5s}
-.next{margin-top:18px;padding:14px 16px;border-left:4px solid var(--red);background:var(--paper);border-radius:0 8px 8px 0}
-.next small{display:block;color:var(--soft);font-size:13px}
-.fig{position:relative;min-height:400px}
-.fig>svg{position:absolute;inset:0;width:100%;height:100%}
-.stamp{opacity:0;transition:opacity .4s}.stamp.on{opacity:.92}
-nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
-.tab{flex:none;min-height:48px;padding:0 18px;border:0;background:none;color:var(--soft);font:600 16px "Instrument Sans",sans-serif;border-bottom:3px solid transparent;cursor:pointer}
-.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--red)}
-.tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:2px}
-section.view{padding-block:32px 64px}
-.howto{border:2px solid var(--red);border-radius:12px;padding:20px 22px;margin-bottom:36px;background:var(--paper)}
-.howto ol{margin:12px 0;padding-left:22px}.howto li{margin-bottom:8px}
-.stufe{margin-bottom:40px}
-.stufe header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:14px}
-.stufe header p{margin:0;color:var(--soft)}
-.badge{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
-.badge.ok{background:var(--oksoft);color:var(--ok)}
-.m{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--bg)}
-details.m[open]{background:var(--paper)}
-.m>summary,.m>.lockrow{list-style:none;display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;min-height:56px}
-.m>summary{cursor:pointer}
-.m>summary::-webkit-details-marker{display:none}
-.m.locked{opacity:.55}
-.num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:600;border:2px solid var(--line);color:var(--soft)}
-.done .num{background:var(--red);border-color:var(--red);color:#fff}
-.cur .num{border-color:var(--red);color:var(--red)}
-.mt{font-weight:600}
-.mt small{display:block;font-weight:400;color:var(--soft);font-size:14px}
-.body{padding:4px 16px 18px 68px}
-.step{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
-.step:first-child{border-top:0;margin-top:0;padding-top:4px}
-.step h3{font-size:20px;margin-bottom:4px}
-.step .hint0{color:var(--soft);font-size:14px;margin:0 0 10px}
-.step.locked>*:not(h3):not(.lockmsg){display:none}
-.lockmsg{display:none;color:var(--soft);font-size:15px;margin:4px 0 0}
-.step.locked .lockmsg{display:block}
-.txt{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:14px 16px;margin:10px 0}
-.txt.isread{border-color:var(--ok)}
-.txthead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
-.txthead b{font-size:17px}
-.src{font-size:13px;color:var(--soft)}
-.empf{font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--red);color:#fff;white-space:nowrap}
-.opt{font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
-.why2{font-size:14px;color:var(--red);margin:6px 0 0;font-weight:500}
-.sum{margin-top:10px}
-.sum>small{display:block;font-size:12px;font-weight:600;color:var(--soft);text-transform:none;margin-bottom:2px}
-.sum p{margin:0 0 8px}.sum ul{margin:4px 0 8px;padding-left:20px}
-.warnbox{background:var(--warnsoft);color:var(--warn);border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
-details.full{border-top:1px dashed var(--line);margin-top:10px;padding-top:4px}
-details.full>summary{cursor:pointer;font-weight:600;padding:10px 0;color:var(--red)}
-details.full pre{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;overflow-x:auto;white-space:pre}
-.stufenprog{margin-top:14px;display:grid;gap:6px}
-.sprow{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr) 3.2em;gap:10px;align-items:center;font-size:14px;color:var(--soft)}
-.sprow b{color:var(--ink);text-align:right;white-space:nowrap}
-.mbar{display:block;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
-.mbar i{display:block;height:100%;background:var(--red);border-radius:3px;transition:width .4s}
-.mbar.big{height:10px;flex-basis:100%;margin-top:4px}
-.sprow .mbar{margin:0}
-.unit{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:12px 16px;margin:10px 0}
-.unit.now{border:2px solid var(--red)}
-.unit.done{border-color:var(--ok)}
-.unit.locked{opacity:.5}
-.uhead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
-.uhead b{font-size:17px}
-.ubadge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--line);color:var(--soft);white-space:nowrap}
-.done>.uhead .ubadge{background:var(--oksoft);color:var(--ok)}
-.now>.uhead .ubadge{background:var(--redsoft);color:var(--red)}
-.linkbtn{background:none;border:0;color:var(--red);font:600 14px "Instrument Sans",sans-serif;padding:8px 0;cursor:pointer;min-height:36px}
-.kq{background:var(--paper);border-radius:8px;padding:12px 14px;margin-top:12px}
-.kq p{margin:0 0 6px}
-.kqmsg{font-size:14px;margin-top:6px;color:var(--ok)}.kqmsg.bad{color:var(--red)}
-.optbox{border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin:12px 0}
-.optbox p{margin:8px 0 2px}
-.pgroup{margin-bottom:22px}.pgroup h3{margin-bottom:6px}
-details.howto>summary{cursor:pointer;list-style:none}details.howto>summary::-webkit-details-marker{display:none}
-details.howto>summary h2::after{content:"  ▾";font-size:20px;color:var(--red)}
-details.howto[open]>summary h2::after{content:"  ▴"}
-@media(max-width:600px){.sprow{grid-template-columns:minmax(0,1fr) 3.2em}.sprow .mbar{grid-column:1/-1;grid-row:2}.unit{padding:12px}}
-.body table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0}
-.body td,.body th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
-.body th{font-weight:600}
-.raetsel{background:var(--redsoft);border-radius:8px;padding:12px 14px;margin:6px 0 12px}
-.raetsel b{display:block;font-size:13px;color:var(--red);margin-bottom:2px}
-textarea{width:100%;min-height:96px;font:16px/1.5 "Instrument Sans",sans-serif;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
-.loes{background:var(--oksoft);border-radius:8px;padding:12px 14px;margin:10px 0}
-.mine{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
-.mine small,.loes small{display:block;font-size:12px;font-weight:600;color:var(--soft)}
-.task{display:flex;gap:10px;align-items:flex-start;padding:6px 0}
-.task input{width:22px;height:22px;margin-top:2px;accent-color:var(--red);flex:none}
-.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
-.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:600 15px "Instrument Sans",sans-serif;cursor:pointer;text-decoration:none}
-.btn.main{background:var(--red);border-color:var(--red);color:#fff}
-.btn.okb{border-color:var(--ok);color:var(--ok)}
-.btn:disabled{opacity:.45;cursor:default}
-.q{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
-.q p{margin:0 0 8px;font-weight:600}
-.optn{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px;cursor:pointer;min-height:44px}
-.optn input{width:20px;height:20px;margin-top:3px;accent-color:var(--red);flex:none}
-.optn.right{background:var(--oksoft)}.optn.wrong{background:var(--redsoft)}
-.why{display:none;font-size:14px;color:var(--soft);margin-top:6px}.checked .why{display:block}
-.result{font-size:18px;font-weight:600;margin:6px 0 14px}
-.pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-.pick .btn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
-.lockbox{border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--soft)}
-.card{perspective:1200px;max-width:560px;height:280px;margin:12px 0 18px;cursor:pointer}
-.card .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
-.card.flip .in{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:28px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);background:var(--paper)}
-.face small{color:var(--soft);font-size:13px;margin-bottom:8px}
-.face div{font-size:21px;font-weight:600;line-height:1.35}
-.back{transform:rotateY(180deg);background:var(--redsoft)}
-.muted{color:var(--soft);font-size:14px}
-.cert{display:none;border:3px double var(--red);border-radius:12px;padding:28px;text-align:center;margin-top:24px}
-.cert.on{display:block}
-footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--soft);font-size:14px}
-@media(max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}.fig{min-height:340px}}
-@media(max-width:600px){.body{padding:4px 12px 16px}.m>summary,.m>.lockrow{grid-template-columns:36px minmax(0,1fr)}.m>summary .badge,.m>.lockrow .badge{display:none}.fig{min-height:290px}.card{height:300px}.txt{padding:12px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+:root{--bg:#f5f3ee;--card:#fff;--ink:#22302e;--muted:#6b7573;--line:#e3dfd6;--pri:#2f6f6a;--pri-l:#e2efed;--ok:#2e8b57;--ok-l:#e3f4ea;--bad:#c4473a;--bad-l:#fbe7e4;--radius:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+body.nonav{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;background:var(--pri);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 12px;z-index:5;display:flex;align-items:center;gap:10px;min-height:52px}
+header h1{font-size:18px;margin:0;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;padding:7px 12px;font-size:15px;flex:none}
+main{max-width:640px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+h2{font-size:17px;margin:0 0 6px}
+p{margin:6px 0}
+.muted{color:var(--muted);font-size:14px}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:13px 14px;font-size:16px;font-weight:600;background:var(--pri);color:#fff;text-align:center;cursor:pointer;font-family:inherit}
+.btn.sec{background:var(--pri-l);color:var(--pri)}
+.btn.ghost{background:#fff;color:var(--pri);border:1px solid var(--line)}
+.btn.danger{background:var(--bad-l);color:var(--bad)}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:8px;align-items:center}
+.row>.btn{flex:1}
+.mt{margin-top:10px}
+.seg{display:flex;background:#eeeae2;border-radius:11px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:9px;font-size:14px;color:var(--ink);min-width:64px;font-family:inherit}
+.seg.four{display:grid;grid-template-columns:1fr 1fr}
+.seg button{min-width:0}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+label.lbl{display:block;font-size:14px;color:var(--muted);margin:14px 0 6px}
+label.chk{display:flex;gap:10px;align-items:center;margin-top:12px;font-size:15px}
+input[type=text],textarea,select{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink)}
+textarea{min-height:170px;resize:vertical}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;border:0;background:none;padding:9px 0 8px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit}
+nav button svg{width:24px;height:24px}
+nav button.on{color:var(--pri);font-weight:600}
+body.nonav nav{display:none}
+.big{font-size:32px;font-weight:700;line-height:1.1}
+.stats{display:flex;gap:10px;margin-bottom:12px}
+.stats .card{flex:1;text-align:center;padding:12px 6px;margin:0}
+.bar{height:8px;background:#ece8df;border-radius:5px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok);border-radius:5px}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.grow{flex:1;min-width:0}
+.en{font-weight:600;word-break:break-word}
+.de{color:var(--muted);font-size:14px;word-break:break-word}
+.dots{display:flex;gap:3px;flex:none}
+.dots i{width:7px;height:7px;border-radius:50%;background:#e1ddd3}
+.dots i.f{background:var(--ok)}
+.icon{border:0;background:var(--pri-l);color:var(--pri);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:15px;cursor:pointer}
+.icon svg{width:20px;height:20px}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--pri);flex:none;margin:0}
+.lesson-head{display:flex;align-items:center;gap:12px;cursor:pointer}
+.chev{color:var(--muted);font-size:22px;transition:transform .2s;padding:0 4px}
+.open .chev{transform:rotate(90deg)}
+.q{text-align:center;padding:24px 16px}
+.q .prompt{font-size:30px;font-weight:700;margin:10px 0 8px;word-break:break-word}
+.q .hint{color:var(--muted);font-size:14px}
+.opts{display:grid;gap:9px}
+.opt{border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px;font-size:17px;text-align:left;color:var(--ink);font-family:inherit;cursor:pointer}
+.opt:disabled{opacity:1;color:var(--ink)}
+.opt.right{background:var(--ok-l);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-l);border-color:var(--bad)}
+.fb{border-radius:12px;padding:14px;margin-top:12px}
+.fb.ok{background:var(--ok-l);color:#1f5e3b}
+.fb.bad{background:var(--bad-l);color:#8a2f26}
+.fb b{font-size:18px}
+.fb .de{color:inherit;opacity:.8}
+.progress{height:6px;background:#e5e1d8;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.progress>i{display:block;height:100%;background:var(--pri);transition:width .3s}
+.sticky-bottom{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom));padding:12px 0 4px;background:linear-gradient(rgba(245,243,238,0),var(--bg) 35%)}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#22302e;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:20;max-width:90%;text-align:center}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:26px 14px}
+.edit-grid{display:grid;gap:8px;width:100%}
+table.prev{width:100%;border-collapse:collapse;font-size:14px}
+table.prev td{padding:6px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+table.prev td:first-child{font-weight:600;width:50%}
+.v{display:block;text-align:center;color:var(--muted);margin:14px 0 4px;font-size:13px}
+.center{text-align:center}
 </style>
 </head>
 <body>
-<div class="wrap hero">
-  <div>
-    <h1>Die Reise der Rechnung 2026-0417</h1>
-    <p class="lead">Ein Lernkurs zur Eingangsrechnungsverarbeitung in zwölf Missionen, aufgeteilt in kurze Häppchen von 2 bis 6 Minuten. Du begleitest eine Rechnung vom Briefkasten bis ins Archiv und sammelst für jede Stufe einen Stempel.</p>
-    <div class="stats">
-      <div class="stat"><b id="sPct">0 %</b><span id="sPctSub">Gesamtfortschritt</span></div>
-    </div>
-    <div class="bar" aria-hidden="true"><i id="pbar" style="width:0"></i></div>
-    <div id="stufenProg" class="stufenprog"></div>
-    <div class="next" id="next"></div>
-  </div>
-  <div class="fig">
-    <svg id="pic" viewBox="0 0 560 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Die Nordwind-Rechnung mit den Stempeln der drei Stufen und einer Spur aus zwölf Stationen"></svg>
-  </div>
-</div>
-
-<nav class="tabs" aria-label="Bereiche"><div class="wrap" role="tablist">
-  <button class="tab" role="tab" id="t-missionen" aria-selected="true" data-v="missionen">Missionen</button>
-  <button class="tab" role="tab" id="t-tests" aria-selected="false" data-v="tests">Stufentests</button>
-  <button class="tab" role="tab" id="t-karten" aria-selected="false" data-v="karten">Karteikarten</button>
-  <button class="tab" role="tab" id="t-praxis" aria-selected="false" data-v="praxis">Praxis</button>
-</div></nav>
-
-<section class="view wrap" id="v-missionen"></section>
-
-<section class="view wrap" id="v-tests" hidden>
-  <h2>Stufentests</h2>
-  <p class="muted">Vier Fragen pro Stufe. Ein Test öffnet sich, sobald alle Lesehäppchen seiner Stufe geschafft sind. Ab drei richtigen Antworten zählt er als bestanden. Den Stempel gibt es, wenn auch alle Rätsel der Stufe gelöst sind.</p>
-  <div class="pick" id="testPick"></div>
-  <div id="testBox"></div>
-</section>
-
-<section class="view wrap" id="v-karten" hidden>
-  <h2>Karteikarten</h2>
-  <p class="muted">Tippe auf die Karte zum Umdrehen. Was du wusstest, kommt aus dem Stapel, der Rest kommt später wieder.</p>
-  <div id="cardBox"></div>
-</section>
-
-<section class="view wrap" id="v-praxis" hidden>
-  <h2>Praxis</h2>
-  <p class="muted">Aufgaben für deinen eigenen Betrieb. Sie zählen nicht zum Lernfortschritt, du kannst sie erledigen, wann es passt. <span id="praxisCount"></span></p>
-  <div id="praxisBox"></div>
-</section>
-
-<div class="wrap"><div class="cert" id="cert">
-  <h2>Geschafft</h2>
-  <p>Alle Häppchen und alle drei Stufentests sind geschafft. Die Rechnung 2026-0417 ist geprüft, freigegeben, gebucht und archiviert, und du weißt, warum.</p>
-</div></div>
-
-<footer class="wrap">
-  <p>Zum Nachlesen: <a href="https://claude.ai/artifact/6Ehgqir8UUQgGgdKfwNGug">Lernkurs als Dokument</a> und <a href="https://claude.ai/artifact/Aje7R1cU9Sd1VGquMAE49u">Anleitung zu d.velop smart invoice</a>. Holzspielzeug Nordwind und die Rechnung sind erfunden. Die Zusammenfassungen fremder Texte sind eigene Worte, Stand November 2026.</p>
-  <p id="saveNote">Dein Fortschritt wird in diesem Browser gespeichert.</p>
-  <p><button class="btn" id="reset">Fortschritt zurücksetzen</button></p>
-</footer>
+<header id="hd"></header>
+<main id="main"></main>
+<nav id="nav">
+  <button data-tab="practice" onclick="go('practice')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Üben</button>
+  <button data-tab="words" onclick="go('words')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7M8 11h7"/></svg>Vokabeln</button>
+  <button data-tab="import" onclick="go('import')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>Import</button>
+  <button data-tab="more" onclick="go('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mehr</button>
+</nav>
+<div class="toast" id="toast"></div>
 
 <script>
-{
-const U={lido:'https://www.lido.app/de/rechnungsverarbeitung',candis:'https://candis.io/blog/eingangsrechnung',dvelop:'https://claude.ai/artifact/Aje7R1cU9Sd1VGquMAE49u',ihkkn:'https://www.ihk.de/konstanz/recht-und-steuern/steuer-und-finanzpolitik/finverwal/aufbewahrung-von-geschaeftsunterlagen-1672476',ihkgera:'https://www.ihk.de/gera/recht-und-steuern/aktuelles-rechtundsteuern/aufbewahrung-von-e-rechnungen-6636974',awv:'https://www.awv-net.de/gobd-leitfaden',lex:'https://www.lexware.de/fileadmin/user_upload/Leitfaden_GoBD.pdf',ihkrn:'https://www.ihk.de/rhein-neckar/recht/steuerrecht/umsatzsteuer/e-rechnungspflicht-5931752',ihkko:'https://www.ihk.de/koblenz/unternehmensservice/recht/steuerrecht/umsatzsteuer/neue-umsatzsteuerregelung-ab-2025-die-erechnung-kommt-6137018',haufe:'https://www.haufe.de/wissen/finance/e-rechnung',agicap:'https://agicap.com/de/artikel/xrechnung/',experte:'https://www.experte.de/buchhaltung/e-rechnung-beispiel',lexprof:'https://www.lexware.de/wissen/faktura-warenwirtschaft/elektronische-rechnungen-zugferd-xrechnung',lidoz:'https://www.lido.app/de/zugferd',ferd:'https://www.ferd-net.de/standards/zugferd',ihkdus:'https://www.ihk.de/duesseldorf/recht-und-steuern/die-e-rechnung-kommt--6182206'};
+const APP_VERSION = '1.0.3';
+const KEY = 'vokabeltrainer-v1';
+// Tage bis zur nächsten Wiederholung je Fach (Fach 0 = neu)
+const INTERVALS = [0, 1, 2, 5, 10, 30];
+const DAY = 86400000;
+const ICON_SPEAK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
 
-const STUFEN=[
- {n:1,name:'Einsteiger',text:'Den Weg einer Rechnung kennen und erkennen, ob sie in Ordnung ist.',stamp:'GEPRÜFT'},
- {n:2,name:'Praktiker',text:'Richtig ablegen und verstehen, was die E-Rechnung verändert.',stamp:'ARCHIVIERT'},
- {n:3,name:'Profi',text:'E-Rechnungen auf Feldebene lesen und den eigenen Ablauf entwerfen.',stamp:'E-RECHNUNG'}];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function todayStr(d = new Date()) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function startOfDay(t = Date.now()) { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); }
 
-const OLD10='nennt noch zehn Jahre Aufbewahrung. Seit 2025 gelten für Rechnungen acht Jahre.';
+// ---------- Daten ----------
+function defaults() {
+  return { lessons: [], words: [], streak: { last: '', count: 0 }, history: [],
+    settings: { dir: 'de-en', mode: 'auto', size: 10, voice: '', autoSpeak: true } };
+}
+function load() {
+  try {
+    const r = JSON.parse(localStorage.getItem(KEY));
+    if (r && Array.isArray(r.words)) {
+      const d = Object.assign(defaults(), r);
+      d.settings = Object.assign(defaults().settings, r.settings || {});
+      return d;
+    }
+  } catch (e) {}
+  return defaults();
+}
+let S = load();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Speichern hat nicht geklappt'); } }
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 
-/* Texte je Mission: t Titel, src Quelle, u Link, sum Zusammenfassung, full Volltext in der App, empf Volltext empfohlen, why Grund, warn Hinweis, opt freiwillig */
-const M=[
-{s:1,t:'Die Rechnung ist da',min:20,
- r:'Die Nordwind-Rechnung liegt vor dir. In welche Reihenfolge gehören: bezahlen, prüfen, archivieren, erfassen, freigeben, buchen?',
- l:'Erfassen, prüfen, freigeben, buchen, bezahlen, archivieren.',
- texte:[
-  {t:'Das Wichtigste in Kürze',src:'Kurs',sum:'<p>Jede Eingangsrechnung durchläuft sieben Stationen: Eingang, Erfassung, Prüfung, Freigabe, Buchung, Zahlung, Archiv. Das ist in jedem Betrieb gleich, ob mit Ordner oder mit Software. Wichtig ist die Reihenfolge: Freigegeben wird nur, was geprüft ist, und gebucht wird nur, was freigegeben ist.</p>'},
-  {t:'Rechnungsverarbeitung: Der vollständige Leitfaden',src:'Lido, Blogartikel, ca. 2.000 Wörter',u:U.lido,
-   sum:'<p>Der Artikel teilt den Ablauf in acht Schritte:</p><ul><li>Eingang per Post, E-Mail, Portal oder als E-Rechnung, am besten über einen zentralen Kanal</li><li>Papier scannen, bildgleich und vollständig</li><li>die wichtigen Angaben aus dem Beleg auslesen</li><li>formale Prüfung auf Pflichtangaben und Rechenfehler, bei Mängeln zurück an den Lieferanten</li><li>sachliche Prüfung: Wurde geliefert, passen Menge und Preis zur Bestellung?</li><li>Freigabe nach Betragsgrenzen und Kostenstellen</li><li>Buchung und Zahlung</li><li>Archivierung, unveränderbar und auffindbar</li></ul><p>Der Rest des Artikels stellt Software-Anbieter vor und ist für die Mission nicht nötig.</p>',
-   warn:'Der Artikel '+OLD10}],
- a:['Bei drei eigenen Rechnungen notieren, wer sie geprüft, bezahlt und abgelegt hat']},
-{s:1,t:'Detektivarbeit',min:30,
- r:'Auf der Rechnung stehen Name und Anschrift von Nordwind und von dir, das Datum, die Nummer 2026-0417, die Artikel mit Menge, 1.200 € netto und 19 % Umsatzsteuer über 228 €. Als Summe steht da 1.418 €. Finde die drei Fehler.',
- l:'Es fehlen die Steuernummer oder USt-IdNr. von Nordwind und der Zeitpunkt der Lieferung. Die Summe ist falsch, richtig wären 1.428 €.',
- texte:[
-  {t:'Pflichtangaben einer Rechnung',src:'Kurs, nach § 14 Abs. 4 UStG',empf:true,why:'Hier ist der Volltext die Liste selbst. Lies jeden Punkt, das Rätsel fragt genau danach.',
-   sum:'<p>Eine Rechnung über 250 € brutto braucht sechs Gruppen von Angaben: wer liefert und wer bekommt, die Steuernummer des Lieferanten, Datum und Nummer, was geliefert wurde, wann geliefert wurde, und die Beträge mit Steuer.</p>',
-   full:'<ul><li>Name und Anschrift von Lieferant und Empfänger</li><li>Steuernummer oder USt-IdNr. des Lieferanten</li><li>Ausstellungsdatum und fortlaufende Rechnungsnummer</li><li>Menge und Art der Leistung</li><li>Zeitpunkt der Lieferung oder Leistung</li><li>Nettobetrag, Steuersatz und Steuerbetrag, oder ein Hinweis, warum keine Steuer anfällt</li></ul><p>Bis 250 € brutto reicht eine Kleinbetragsrechnung (§ 33 UStDV). Sie braucht nur Name und Anschrift des Lieferanten, das Datum, die Leistung, den Bruttobetrag und den Steuersatz. Der Empfänger muss nicht draufstehen.</p>'}],
- a:['Fünf echte Rechnungen gegen die Liste prüfen']},
-{s:1,t:'Fehler gefunden, und jetzt?',min:30,
- r:'Du willst die Summe mit dem Kuli korrigieren. Darfst du das? Und auf dem Lieferschein stehen nur zwei Kisten Bausteine statt drei.',
- l:'Nein, korrigieren muss Nordwind. Wegen der fehlenden Kiste ist die Rechnung auch sachlich falsch. Du bittest um eine neue Rechnung.',
- texte:[
-  {t:'Das Wichtigste in Kürze',src:'Kurs',sum:'<p>Es gibt drei Prüfungen. Die formale fragt, ob alle Pflichtangaben da sind. Die rechnerische fragt, ob die Summen stimmen. Die sachliche fragt, ob das so bestellt und geliefert wurde.</p>'},
-  {t:'Eingangsrechnungen: Definition, Prüfung und Verarbeitung',src:'Candis, Blogartikel',u:U.candis,
-   sum:'<ul><li>Eine Eingangsrechnung ist eine Rechnung, die du von einem Lieferanten bekommst. Vor Buchung und Zahlung wird sie geprüft und freigegeben.</li><li>Formal prüfst du die Pflichtangaben, sachlich gleichst du mit Lieferschein, Bestellung oder Vertrag ab.</li><li>Fehler korrigierst du nie selbst, denn die Rechnung muss im Original erhalten bleiben. Du forderst beim Lieferanten eine korrigierte Fassung an.</li><li>Ohne korrekte Rechnung kann der Vorsteuerabzug wegfallen.</li><li>Typische Fehler: fehlende Angaben, doppelte Rechnungen und bei E-Rechnungen Unterschiede zwischen PDF und XML.</li></ul>',
-   warn:'Der Artikel '+OLD10}],
- a:['Eine kurze Nachricht an Nordwind schreiben und um eine korrigierte Rechnung bitten']},
-{s:1,t:'Wer darf Ja sagen?',min:30,
- r:'Du hast die Lieferung geprüft. Darfst du die Rechnung auch gleich selbst freigeben? Und wenn sie über 15.000 € läge?',
- l:'Besser nicht. Prüfen und Freigeben sollten verschiedene Personen machen. d.velop smart invoice verlangt über 10.000 € eine zweite Person und schließt den sachlichen Prüfer von der Freigabe aus.',
- texte:[
-  {t:'Vier-Augen-Prinzip',src:'Deine Anleitung zu d.velop smart invoice',u:U.dvelop,
-   sum:'<ul><li>Das Vier-Augen-Prinzip trennt Prüfen und Freigeben.</li><li>In d.velop smart invoice greift es bei Beträgen über 10.000 €: Dann braucht es immer eine zweite Person, auch wenn eigentlich eine reichen würde.</li><li>Wer die Rechnung sachlich geprüft hat, darf sie nicht freigeben.</li><li>Man kann einen Mindestbetrag einstellen, darunter darf die Freigabe übersprungen werden.</li></ul>'}],
- a:['Festlegen: Wer prüft, wer gibt frei, ab welchem Betrag braucht es eine zweite Person?']},
-{s:2,t:'Ab ins Archiv',min:45,
- r:'Die korrigierte Rechnung kommt auf Papier. Du scannst sie, wirfst das Papier weg und löschst die erste, fehlerhafte Rechnung. Was davon ist in Ordnung?',
- l:'Scannen ist in Ordnung, wenn der Scan bildgleich und vollständig ist und das Vorgehen dokumentiert ist. Das Papier darf danach weg. Die erste Rechnung löschst du nicht, sie gehört zum Vorgang.',
- texte:[
-  {t:'Das Wichtigste in Kürze',src:'Kurs',sum:'<p>Die GoBD sind die Regeln der Finanzverwaltung für digitale Buchführung. Belege müssen nachvollziehbar, vollständig, richtig, zeitgerecht, geordnet und unverändert aufbewahrt werden. Rechnungen bewahrst du seit 2025 acht Jahre auf.</p>'},
-  {t:'Aufbewahrung von Geschäftsunterlagen',src:'IHK Hochrhein-Bodensee (Konstanz), Ratgeber mit den Regeln ab 2025',u:U.ihkkn,empf:true,why:'Lies das Kapitel zur Form der Aufbewahrung ganz. Dort steht, wann ein Scan reicht und was bei E-Rechnungen gilt. Die lange ABC-Tabelle am Ende kannst du auslassen.',
-   sum:'<ul><li>Rechnungen und andere Buchungsbelege werden seit 1. Januar 2025 acht Jahre aufbewahrt, vorher zehn. Bücher, Jahresabschlüsse und die Verfahrensdokumentation bleiben bei zehn Jahren, Geschäftsbriefe bei sechs.</li><li>Die Frist beginnt am Ende des Jahres, in dem die Rechnung eingegangen ist. Eine Rechnung vom November 2026 darf also frühestens Anfang 2035 weg.</li><li>Rechnungen dürfen als Scan aufbewahrt werden, wenn der Scan inhaltlich und bildlich mit dem Original übereinstimmt und jederzeit lesbar ist. Jahresabschlüsse und Eröffnungsbilanzen bleiben im Original.</li><li>Bei E-Rechnungen wird der strukturierte Teil unverändert im Eingangsformat gespeichert, umwandeln ist nicht erlaubt.</li><li>Die Ablage muss revisionssicher sein und während der ganzen Frist lesbar bleiben.</li></ul>'},
-  {t:'Aufbewahrung von E-Rechnungen',src:'IHK Ostthüringen, Juli 2025',u:U.ihkgera,
-   sum:'<ul><li>Die Finanzverwaltung hat die GoBD im Juli 2025 an die E-Rechnung angepasst.</li><li>Eingehende E-Rechnungen werden elektronisch im Originalformat aufbewahrt. Ein Ausdruck oder nur die PDF reicht nicht.</li><li>Wichtig ist der strukturierte Teil, also die XML. Die PDF-Ansicht muss nur dann zusätzlich aufbewahrt werden, wenn sie steuerlich wichtige Angaben enthält, die nicht in der XML stehen, etwa Buchungsvermerke.</li><li>Beim Umwandeln in ein anderes Format dürfen die Daten nicht verändert werden.</li></ul>'},
-  {t:'GoBD: Ein Praxisleitfaden für Unternehmen, Version 2.2',src:'AWV, kostenloser Download, Dezember 2023',u:U.awv,opt:true,
-   sum:'<p>Der ausführliche Leitfaden der Arbeitsgemeinschaft für wirtschaftliche Verwaltung, entwickelt mit den Kammern. Gut zum Nachschlagen einzelner Fragen, für die Mission aber zu lang.</p>',
-   warn:'Version 2.2 ist von Ende 2023. Die achtjährige Frist und die GoBD-Änderung zur E-Rechnung vom Juli 2025 stehen noch nicht darin. Eine neue Version ist angekündigt.'}],
- a:['Prüfen, ob die eigene Ablage Dateien vor nachträglichem Ändern schützt']},
-{s:2,t:'Schreib es auf',min:45,
- r:'Ein Betriebsprüfer fragt: „Wie kommt bei Ihnen eine Rechnung ins Archiv?“ Kannst du das in einer Minute erklären?',
- l:'Deine eigene Antwort. Wenn du sie in fünf Sätzen aufschreiben kannst, hast du den Kern einer Verfahrensdokumentation.',
- texte:[
-  {t:'Leitfaden GoBD',src:'Lexware, PDF',u:U.lex,empf:true,why:'Lies den Abschnitt zur Verfahrensdokumentation ganz. Er ist die Vorlage für deine eigene Aufgabe in dieser Mission.',
-   sum:'<ul><li>Jedes Unternehmen, das Belege elektronisch aufbewahrt, braucht eine Verfahrensdokumentation, egal wie klein.</li><li>Sie beschreibt, wie Belege entstehen und ankommen, wie sie verarbeitet, gespeichert und wiedergefunden werden, welche Programme im Einsatz sind, wer Zugriff hat und wie Daten gesichert werden.</li><li>Änderungen werden mit Datum festgehalten. Die Dokumentation wird so lange aufbewahrt wie die Belege selbst.</li><li>Fehlt sie, ist das nicht automatisch ein Verstoß. Das Finanzamt darf aber schätzen, wenn sich etwas nicht nachvollziehen lässt.</li><li>Seit Juli 2025 genügt es, bei E-Rechnungen den Datensatz aufzubewahren, ein zusätzliches Bild ist nicht nötig.</li></ul>'}],
- a:['Die eigene Verfahrensdokumentation in fünf Sätzen schreiben']},
-{s:2,t:'Plötzlich XML',min:45,
- r:'Die nächste Nordwind-Rechnung kommt als .xml-Datei. Musst du sie annehmen? Ab wann muss Nordwind so schicken?',
- l:'Ja, annehmen musst du seit 2025. Ausstellen muss Nordwind ab 2027, wenn der Umsatz 2026 über 800.000 € lag, sonst ab 2028.',
- texte:[
-  {t:'Die Fristen in Kürze',src:'Kurs',sum:'<table><tr><th>Ab</th><th>Was gilt</th></tr><tr><td>1.1.2025</td><td>Alle Unternehmen müssen E-Rechnungen empfangen können</td></tr><tr><td>1.1.2027</td><td>Ausstellen ist Pflicht bei mehr als 800.000 € Umsatz in 2026</td></tr><tr><td>1.1.2028</td><td>Ausstellen ist Pflicht für alle übrigen</td></tr></table>'},
-  {t:'E-Rechnungspflicht für B2B-Umsätze',src:'IHK Rhein-Neckar, Merkblatt',u:U.ihkrn,
-   sum:'<ul><li>Eine E-Rechnung ist strukturiert und folgt der Norm EN 16931. PDF- oder Word-Dateien sind sonstige Rechnungen.</li><li>Betroffen sind Unternehmen in Deutschland, die an andere Unternehmen in Deutschland liefern.</li><li>Kleinbetragsrechnungen bis 250 € und Fahrkarten sind ausgenommen.</li><li>Kleinunternehmer müssen nie E-Rechnungen ausstellen, empfangen müssen sie aber auch.</li><li>Empfänger brauchen eine lesbare Ansicht, etwa über den kostenlosen ELSTER-Viewer, und archivieren die XML-Datei unverändert.</li></ul>',
-   warn:'Im Merkblatt widersprechen sich Text und Tabelle bei den Regeln für 2027. Verlass dich bei den Fristen auf die IHK Koblenz.'},
-  {t:'Die E-Rechnung kommt',src:'IHK Koblenz, Stand Ende 2026',u:U.ihkko,empf:true,why:'Die Seite ist auf dem neuesten Stand und erklärt das BMF-Schreiben vom Oktober 2026. Die Tabelle der Übergangsfristen solltest du einmal im Original gesehen haben.',
-   sum:'<ul><li>PDFs, Bilder und Scans sind keine E-Rechnungen. Bei ZUGFeRD zählt nur der strukturierte Teil.</li><li>Sonstige Rechnungen sind 2025 und 2026 mit Zustimmung des Empfängers erlaubt, 2027 nur noch bei höchstens 800.000 € Vorjahresumsatz, ab 2028 gar nicht mehr.</li><li>Für den Empfang reicht meist ein E-Mail-Postfach. Der ELSTER-Viewer zeigt XRechnung und ZUGFeRD kostenlos an.</li><li>Laut BMF-Schreiben vom Oktober 2026 macht ein technischer Formfehler eine E-Rechnung nicht automatisch ungültig, entscheidend sind die Pflichtangaben. Die Leistungsbeschreibung muss in den strukturierten Daten stehen, nicht nur im PDF.</li></ul>'}],
- a:['Klären, wie E-Rechnungen bei dir ankommen und wer sie öffnen kann']},
-{s:2,t:'Sortierstunde',min:30,
- r:'Vier Rechnungen: PDF per Mail vom Stromanbieter, XRechnung von Nordwind, ZUGFeRD-Datei vom Großhandel, Papierrechnung vom Handwerker. Welche sind E-Rechnungen?',
- l:'Die XRechnung und die ZUGFeRD-Datei, sofern ihr Profil gültig ist. PDF und Papier sind sonstige Rechnungen.',
- texte:[
-  {t:'E-Rechnung: Pflicht, Formate, Fristen',src:'Haufe, kurzer Artikel, etwa 4 Minuten',u:U.haufe,
-   sum:'<ul><li>E-Rechnung heißt: strukturiertes Format, das eine Software ohne Abtippen verarbeiten kann, meist eine XML-Datei.</li><li>Eine PDF zeigt nur an und gilt als sonstige Rechnung, ebenso Scans und Fotos. Eine E-Mail mit PDF-Anhang ist also keine E-Rechnung.</li><li>Zulässig sind XRechnung (reine XML) und ZUGFeRD ab Version 2.0.1 (PDF mit XML).</li><li>Dauerhaft ausgenommen sind Rechnungen an Privatleute, Kleinbetragsrechnungen bis 250 €, Fahrkarten, Kleinunternehmer und bestimmte steuerfreie Umsätze.</li></ul>'}],
- a:['Die letzten zehn Firmenrechnungen in E-Rechnung, PDF und Papier sortieren']},
-{s:3,t:'Blick unter die Haube',min:60,
- r:'In der Nordwind-XML steht irgendwo 2026-0417. Woran erkennt eine Software, dass das die Rechnungsnummer ist?',
- l:'Am Feld, in dem der Wert steht. Die Rechnungsnummer steht immer in BT-1.',
- texte:[
-  {t:'Wie eine E-Rechnung aufgebaut ist',src:'Kurs, Lesetext',empf:true,why:'Dieser Text deckt die Testfragen zu BT-Feldern ab. Lies ihn ganz, mit dem XML-Beispiel.',
-   sum:'<p>Die Norm EN 16931 gibt jedem Rechnungsfeld eine feste Nummer, den Business Term (BT). BT-1 ist immer die Rechnungsnummer, BT-2 das Datum, BT-112 die Bruttosumme. Zusammengehörige Felder bilden eine Business Group (BG). Die XML gibt es in zwei Schreibweisen, UBL und CII, mit gleichem Inhalt.</p>',
-   full:`<p>Auf einer Papierrechnung findet ein Mensch die Rechnungsnummer, weil er weiß, wie eine Rechnung aussieht. Eine Software weiß das nicht. Sie braucht feste Plätze, an denen jede Angabe steht.</p>
-<p>Diese Plätze legt die europäische Norm EN 16931 fest. Sie beschreibt, welche Angaben eine Rechnung enthalten kann, und gibt jedem Feld eine feste Nummer. So eine Nummer heißt Business Term, kurz BT. Die Rechnungsnummer steht immer in BT-1, das Rechnungsdatum in BT-2, das Fälligkeitsdatum in BT-9, die Summe ohne Steuer in BT-109 und die Summe mit Steuer in BT-112. Egal welcher Lieferant die Rechnung schickt und mit welchem Programm: BT-1 ist immer die Rechnungsnummer.</p>
-<p>Manche Angaben gehören zusammen, zum Beispiel alle Daten für die Überweisung. Solche Gruppen heißen Business Group, kurz BG. Die Bankverbindung ist BG-17, darin liegen die Felder BT-84 bis BT-86. Was in kein Feld passt, kommt als Freitext in BT-22.</p>
-<p>Technisch ist eine E-Rechnung eine XML-Datei. XML ist reiner Text, in dem jeder Wert zwischen zwei Markierungen steht. Ein Ausschnitt der Nordwind-Rechnung könnte so aussehen (Datum erfunden):</p>
-<pre>&lt;cbc:ID&gt;2026-0417&lt;/cbc:ID&gt;
-&lt;cbc:IssueDate&gt;2026-11-16&lt;/cbc:IssueDate&gt;
-&lt;cbc:TaxExclusiveAmount currencyID="EUR"&gt;1200.00&lt;/cbc:TaxExclusiveAmount&gt;
-&lt;cbc:TaxInclusiveAmount currencyID="EUR"&gt;1428.00&lt;/cbc:TaxInclusiveAmount&gt;</pre>
-<p>Die erste Zeile ist BT-1, die zweite BT-2, dann BT-109 und BT-112. Die Spezifikation der Norm enthält eine Tabelle, die jeder BT-Nummer ihre Markierung in der XML zuordnet.</p>
-<p>Die Norm erlaubt zwei Schreibweisen für die XML: UBL und CII. Der Inhalt ist derselbe, nur die Markierungen heißen anders. Der Ausschnitt oben ist UBL. Für dich als Empfänger ist das egal, ein Viewer oder deine Buchhaltungssoftware liest beide.</p>`},
-  {t:'XRechnung im Mittelstand',src:'Agicap, Blogartikel',u:U.agicap,
-   sum:'<ul><li>Die XRechnung ist die deutsche Fassung der Norm, eine reine XML-Datei ohne Bild. Sie wird von der KoSIT betreut.</li><li>Die deutschen Zusatzregeln heißen CIUS, die Erweiterungen um zusätzliche Angaben Extension.</li><li>Seit Version 3.0 sind auch Geschäftsprozess und die elektronischen Adressen von Verkäufer und Käufer Pflicht (BT-23, BT-34, BT-49).</li><li>In BT-10 steht bei Rechnungen an Behörden die Leitweg-ID, zwischen Firmen reicht ein Platzhalter.</li><li>Version 3.0 gilt mindestens bis Ende Juli 2027. Von Version 4.0 gibt es seit September 2026 eine Vorversion, das fertige Paket ist für Frühjahr 2027 angekündigt.</li></ul>'},
-  {t:'E-Rechnung Beispiel',src:'experte.de, mit Muster der Bundesagentur für Arbeit',u:U.experte,empf:true,why:'Das Wichtigste ist hier ein Bild: eine echte Musterrechnung, an der jedes Feld mit seiner BT-Nummer markiert ist. Das lässt sich nicht zusammenfassen, schau es dir an.',
-   sum:'<ul><li>Der Artikel zeigt eine XRechnung und eine ZUGFeRD-Rechnung als Bild.</li><li>Eine große Tabelle listet die Pflichtfelder mit BT-Nummer, etwa BT-1 Rechnungsnummer, BT-31 USt-ID, BT-84 IBAN, BT-112 Bruttosumme, BT-153 Artikelname.</li><li>Manche Felder sind nur in bestimmten Fällen Pflicht, zum Beispiel bei abweichendem Zahlungsempfänger.</li><li>Der Artikel enthält Werbung für Rechnungsprogramme.</li></ul>'}],
- a:['Jeder Angabe der Nordwind-Rechnung ihr BT-Feld zuordnen']},
-{s:3,t:'Welches Profil?',min:30,
- r:'Der Großhandel schickt ZUGFeRD im Profil BASIC WL. Ist das eine gültige E-Rechnung?',
- l:'Nein, BASIC WL enthält keine Rechnungspositionen und gilt nicht als E-Rechnung.',
- texte:[
-  {t:'XRechnung, ZUGFeRD und die Profile',src:'Kurs, Lesetext',empf:true,why:'Dieser Text deckt die Testfragen zu den Formaten und Profilen ab. Lies ihn ganz.',
-   sum:'<p>Die XRechnung ist eine reine XML-Datei. ZUGFeRD ist ein PDF mit eingebetteter XML, rechtlich zählt die XML. Ein ZUGFeRD-Profil legt fest, wie viele Angaben in der XML stehen. MINIMUM und BASIC WL fehlen die Positionen, sie sind keine gültige E-Rechnung. Sicher ist EN 16931.</p>',
-   full:`<p>In Deutschland sind zwei Formate üblich, die beide auf der Norm EN 16931 beruhen.</p>
-<p>Die XRechnung ist eine reine XML-Datei ohne Bild. Öffnet man sie ohne passendes Programm, sieht man nur Text mit Markierungen. Sie ist die deutsche Fassung der Norm und ergänzt sie um eigene Regeln. Behörden verlangen sie meistens.</p>
-<p>ZUGFeRD ist ein PDF, in das eine XML-Datei eingebettet ist. Ein Mensch öffnet es wie jedes PDF und sieht eine normale Rechnung. Die Buchhaltungssoftware liest dagegen die eingebettete XML. Man nennt das ein hybrides Format. Rechtlich zählt nur der strukturierte Teil, also die XML. Deshalb lohnt es sich zu prüfen, ob beides übereinstimmt.</p>
-<p>ZUGFeRD gibt es in mehreren Profilen. Ein Profil legt fest, wie viele Angaben in der XML stehen:</p>
-<ul><li>MINIMUM enthält nur wenige Kopfdaten und die Summen.</li>
-<li>BASIC WL enthält Kopfdaten, aber keine Rechnungspositionen. WL steht für „without lines“, also ohne Zeilen.</li>
-<li>BASIC enthält die Grunddaten mit Positionen.</li>
-<li>EN 16931, früher COMFORT genannt, enthält den vollständigen Datensatz der Norm.</li>
-<li>EXTENDED enthält zusätzliche Felder für komplizierte Fälle.</li>
-<li>XRECHNUNG bildet die Regeln der XRechnung im ZUGFeRD-Format ab.</li></ul>
-<p>Als E-Rechnung zählen nur Profile mit vollständigen Rechnungsangaben. MINIMUM und BASIC WL fehlen die Positionen, deshalb sind sie keine gültige E-Rechnung. Bei BASIC sind sich die Quellen nicht einig. Wer auf Nummer sicher gehen will, verlangt EN 16931.</p>
-<p>Welches Profil eine Datei hat, steht in BT-24, der Spezifikationskennung. Die aktuelle Version ist ZUGFeRD 2.5, gültig seit Juli 2026. Im August 2026 kam die Korrekturfassung 2.5.2 heraus.</p>`},
-  {t:'ZUGFeRD und XRechnung im Überblick',src:'Lexware, Ratgeber',u:U.lexprof,
-   sum:'<ul><li>ZUGFeRD ist ein lesbares PDF/A-3 mit eingebetteter XML.</li><li>Ab Version 2.0.1 zählt ZUGFeRD als E-Rechnung, wenn das Profil passt.</li><li>Gültig: BASIC, EN 16931, EXTENDED, XRECHNUNG. Nicht gültig: MINIMUM und BASIC WL.</li><li>Version 1.0 von 2014 entspricht der Norm noch nicht.</li></ul>'},
-],
- a:['Notieren, welches Profil du von Lieferanten verlangen würdest']},
-{s:3,t:'Selbst ausprobieren',min:60,
- r:'Kannst du eine echte E-Rechnung öffnen, prüfen und richtig ablegen, ohne nachzuschlagen?',
- l:'Wenn alle vier Aufgaben unten abgehakt sind: ja.',
- texte:[
-  {t:'ZUGFeRD beim FeRD',src:'Forum elektronische Rechnung Deutschland',u:U.ferd,
-   sum:'<ul><li>Unter „Standards und FAQs“, dann „ZUGFeRD/Factur-X“ gibt es die Spezifikation zum Herunterladen.</li><li>Unter „ZUGFeRD-Beispielrechnungen“ findest du fertige Beispieldateien zum Ausprobieren.</li><li>Neueste Fassung ist ZUGFeRD 2.5.2 vom August 2026.</li></ul>'},
-  {t:'Womit du E-Rechnungen öffnest',src:'Kurs',sum:'<p>Die Finanzverwaltung bietet in ELSTER einen kostenlosen Viewer an, der XRechnung und ZUGFeRD lesbar anzeigt und prüft. Erstellen kann er keine Rechnungen.</p>'}],
- a:['Beispieldatei im Viewer öffnen und die Pflichtangaben suchen','Bei einer ZUGFeRD-Datei das Profil in BT-24 nachsehen','Prüfen, ob PDF-Ansicht und XML übereinstimmen','Die Datei im Original ablegen']},
-{s:3,t:'Dein eigener Workflow',min:60,
- r:'Nordwind wird Stammlieferant. Wie soll jede ihrer Rechnungen künftig bei dir laufen?',
- l:'Deine eigene Antwort ist das Abschlussprojekt.',
- texte:[
-  {t:'Wer bekommt die Aufgabe? Bearbeiterfindung',src:'Kurs, Lesetext',empf:true,why:'Dieser Text deckt die Testfrage zur Bearbeiterfindung ab. Lies ihn ganz.',
-   sum:'<p>Die Bearbeiterfindung ist eine Bedingung, die für jeden Benutzer und jede Gruppe geprüft wird. Wer sie erfüllt, ist ein Treffer. Bei „Alle Treffer verwenden“ bekommen alle die Aufgabe, und wer zuerst abschließt, beendet sie für alle. Bei „Auswahl anbieten“ wählt die Person im vorigen Schritt aus.</p>',
-   full:`<p>In einer Software wie d.velop smart invoice läuft jede Rechnung durch Schritte: Verteilung, Prüfung, Freigabe, Buchhaltung. Bei jedem Schritt muss die Software wissen, wer die Aufgabe bekommt. Das regelt die Bearbeiterfindung.</p>
-<p>Eine Bearbeiterfindung ist eine Bedingung. Die Software prüft sie für jeden Benutzer und jede Gruppe. Wer die Bedingung erfüllt, ist ein Treffer und kommt als Bearbeiter in Frage. Ein einfaches Beispiel für den Schritt Freigabe: <code>user.name = "Geschäftsführung"</code>. Dann bekommt die Gruppe Geschäftsführung die Aufgabe.</p>
-<p>Oft passen mehrere Treffer, etwa wenn die Bedingung zwei Gruppen nennt. Dann entscheidet eine von zwei Einstellungen, was passiert:</p>
-<ul><li><b>Alle Treffer verwenden:</b> Alle Treffer bekommen die Aufgabe gleichzeitig. Sobald einer von ihnen sie abschließt, verschwindet sie bei allen anderen. Das passt, wenn es egal ist, wer sich kümmert, Hauptsache schnell.</li>
-<li><b>Auswahl anbieten:</b> Die Person im vorigen Schritt sieht die Treffer und wählt aus, wer die Aufgabe bekommt. Das passt, wenn jemand bewusst entscheiden soll, wer zuständig ist.</li></ul>
-<p>Für die sachliche Prüfung gibt es eine besondere Bedingung: <code>user.name IN voucher.outstanding_verifiers</code>. Sie trifft alle Prüfer, die bei dieser Rechnung noch nicht geprüft haben.</p>
-<p>Das Vier-Augen-Prinzip ergänzt die Bearbeiterfindung bei der Freigabe. Bei Beträgen über 10.000 € verlangt die Software eine zweite Person, auch wenn eigentlich eine reichen würde. Wer die Rechnung sachlich geprüft hat, darf sie nicht selbst freigeben.</p>
-<p>Ein Tipp aus der Praxis: Trag in Bearbeiterfindungen Gruppen ein, nicht einzelne Personen. Wechselt jemand die Stelle, änderst du nur die Gruppe und nicht den ganzen Ablauf.</p>`},
-  {t:'Anleitung zu d.velop smart invoice',src:'Deine Dokumentation',u:U.dvelop,
-   sum:'<ul><li>Der Onboarding-Assistent legt einen Ablauf mit Verteilung, Prüfung, Freigabe und Buchhaltung an.</li><li>Freigaben gehen einfach über eine Gruppe oder über eine Freigabematrix mit Kostenstellen und Betragsgrenzen.</li><li>Die Anleitung enthält eine Checkliste für den Test vor dem Echtbetrieb und offene Fragen, die jeder Betrieb selbst klären muss.</li></ul>'},
-  {t:'Webinar „E-Rechnung 2027: Jetzt wird’s ernst – und effizient“',src:'IHK Düsseldorf, 8. Dezember 2026, 10:30 bis 12:00 Uhr',u:U.ihkdus,opt:true,
-   sum:'<p>Kostenloses Webinar mit Anmeldung, Referent ist ein Steuerberater. Themen sind die Rechtslage, die Fristen und die digitale Rechnungsverarbeitung. Die Seite rät, früh zu planen, den Rechnungseingang neu zu ordnen und den kostenlosen ELSTER-Viewer zu nutzen.</p>'}],
- a:['Den Ablauf von Eingang bis Archiv mit Namen an jeder Station zeichnen','Freigaberegeln festlegen: wer, bis zu welchem Betrag, wer vertritt','Die Verfahrensdokumentation um E-Rechnungen ergänzen']}
-].map((m,i)=>({...m,id:'m'+(i+1),n:i+1}));
+const word = id => S.words.find(w => w.id === id);
+const lesson = id => S.lessons.find(l => l.id === id);
+const lessonWords = id => S.words.filter(w => w.lessonId === id);
+const dueWords = () => { const now = Date.now(); return S.words.filter(w => (w.due || 0) <= now); };
+const sizeVal = () => Number(S.settings.size) || 0;
 
-const Q={1:[
- ['Welche Reihenfolge stimmt?',['Prüfen, freigeben, buchen','Buchen, prüfen, freigeben','Freigeben, prüfen, buchen'],0,'Freigegeben wird nur, was geprüft ist, gebucht nur, was freigegeben ist.'],
- ['Was fragt die sachliche Prüfung?',['Sind alle Pflichtangaben da?','Wurde das so bestellt und geliefert?','Stimmen die Summen?'],1,'Pflichtangaben sind die formale, Summen die rechnerische Prüfung.'],
- ['Eine Baumarktquittung über 180 € nennt deine Anschrift nicht.',['Sie ist ungültig','Sie ist in Ordnung','Sie braucht einen Stempel'],1,'Bis 250 € brutto reicht eine Kleinbetragsrechnung ohne Empfänger.'],
- ['Der Steuersatz auf einer Rechnung ist falsch.',['Selbst korrigieren','Beim Lieferanten eine korrigierte Rechnung anfordern','Einfach weniger zahlen'],1,'Den Fehler korrigiert immer der Lieferant.']],
-2:[
- ['Wie lange bewahrst du eine Rechnung von 2026 auf?',['6 Jahre','8 Jahre','10 Jahre'],1,'Seit 2025 gelten für Buchungsbelege acht Jahre.'],
- ['Eine E-Rechnung kommt als XML. Reicht ein Ausdruck im Ordner?',['Ja','Nein, die XML muss im Original aufbewahrt werden','Nur mit Unterschrift'],1,'Das Original ist die Datei, nicht der Ausdruck.'],
- ['Eine PDF-Rechnung per Mail ist …',['eine E-Rechnung','eine sonstige Rechnung','eine Kleinbetragsrechnung'],1,'Ohne strukturierte Daten ist sie keine E-Rechnung.'],
- ['Ab wann muss ein Betrieb mit 300.000 € Jahresumsatz E-Rechnungen ausstellen?',['1.1.2025','1.1.2027','1.1.2028'],2,'2027 trifft nur Betriebe über 800.000 € Umsatz.']],
-3:[
- ['In welchem Feld steht die Rechnungsnummer?',['BT-1','BT-9','BT-112'],0,'BT-9 ist das Fälligkeitsdatum, BT-112 die Bruttosumme.'],
- ['ZUGFeRD ist …',['eine reine XML-Datei','ein PDF mit eingebetteter XML','ein Papierformat'],1,'Die reine XML-Datei ist die XRechnung.'],
- ['Ist ZUGFeRD im Profil BASIC WL eine gültige E-Rechnung?',['Ja','Nein','Nur für Behörden'],1,'BASIC WL enthält keine Rechnungspositionen.'],
- ['Was bewirkt „Alle Treffer verwenden“ bei der Bearbeiterfindung?',['Alle bekommen die Aufgabe, wer zuerst abschließt, beendet sie für alle','Nur der erste Treffer bekommt die Aufgabe','Die Person im vorigen Schritt wählt aus'],0,'Das Auswählen ist die Option „Auswahl anbieten“.']]};
-
-const C=[
- ['Die sieben Stationen einer Eingangsrechnung?','Eingang, Erfassung, Prüfung, Freigabe, Buchung, Zahlung, Archiv'],
- ['Welche drei Prüfungen gibt es?','Formal, rechnerisch und sachlich'],
- ['Wo stehen die Pflichtangaben einer Rechnung?','§ 14 Abs. 4 UStG'],
- ['Bis zu welchem Betrag gilt die Kleinbetragsrechnung?','250 € brutto'],
- ['Wer korrigiert eine fehlerhafte Rechnung?','Der Lieferant, mit einer neuen Rechnung'],
- ['Wie lange werden Rechnungen aufbewahrt?','Acht Jahre (seit 2025)'],
- ['Die GoBD-Grundsätze für Belege?','Nachvollziehbar, vollständig, richtig, zeitgerecht, geordnet, unverändert'],
- ['Darf das Papier nach dem Scannen weg?','Ja, wenn der Scan inhaltlich übereinstimmt und lesbar bleibt. Ausnahmen sind z. B. Jahresabschlüsse und amtliche Urkunden'],
- ['Was beschreibt die Verfahrensdokumentation?','Wie Belege ankommen, wer sie bearbeitet, wo sie landen und wer Zugriff hat'],
- ['Seit wann müssen alle Unternehmen E-Rechnungen empfangen können?','Seit 1. Januar 2025'],
- ['Wer muss ab 1.1.2027 E-Rechnungen ausstellen?','Unternehmen mit mehr als 800.000 € Umsatz in 2026'],
- ['Ab wann müssen alle übrigen Unternehmen E-Rechnungen ausstellen?','Ab 1. Januar 2028'],
- ['Gilt die E-Rechnungspflicht für Rechnungen an Privatleute?','Nein, nur zwischen Unternehmen'],
- ['Kleinunternehmer und E-Rechnung?','Ausstellen müssen sie nicht, empfangen schon'],
- ['Womit kann man E-Rechnungen kostenlos ansehen?','Mit dem Viewer in ELSTER'],
- ['Auf welcher Norm beruhen XRechnung und ZUGFeRD?','EN 16931'],
- ['Was ist ein Business Term (BT)?','Die genormte Kennung eines Rechnungsfelds'],
- ['Was steht in BT-1, BT-2 und BT-112?','Rechnungsnummer, Rechnungsdatum, Summe brutto'],
- ['Die zwei Syntaxen der EN 16931?','UBL und CII'],
- ['Was zählt rechtlich bei ZUGFeRD, PDF oder XML?','Die XML, also der strukturierte Teil'],
- ['Welches ZUGFeRD-Profil wird empfohlen?','EN 16931 (früher COMFORT)'],
- ['Welche ZUGFeRD-Profile gelten nicht als E-Rechnung?','MINIMUM und BASIC WL'],
- ['Ab welchem Betrag verlangt d.velop smart invoice beim Vier-Augen-Prinzip eine zweite Person?','Über 10.000 €'],
- ['Wer ist beim Vier-Augen-Prinzip von der Freigabe ausgeschlossen?','Wer die sachliche Prüfung gemacht hat']];
-
-/* Kontrollfrage je Pflichttext: [Frage, Antworten, richtig, Erklärung] */
-const KQ={
- 'm1-0':['Was kommt zuerst?',['Freigeben','Prüfen','Das ist egal'],1,'Freigegeben wird nur, was vorher geprüft ist.'],
- 'm1-1':['Was fragt die sachliche Prüfung laut Lido?',['Ob alle Pflichtangaben da sind','Ob geliefert wurde und Menge und Preis zur Bestellung passen','Ob die Rechnung schon im Archiv liegt'],1,'Pflichtangaben und Rechenfehler gehören zur formalen Prüfung.'],
- 'm2-0':['Welche Angabe gehört nicht zu den Pflichtangaben?',['Zeitpunkt der Lieferung','Telefonnummer des Lieferanten','Steuernummer oder USt-IdNr. des Lieferanten'],1,'Eine Telefonnummer ist praktisch, aber keine Pflicht.'],
- 'm3-0':['Was fragt die rechnerische Prüfung?',['Ob die Summen stimmen','Ob geliefert wurde','Ob alle Angaben da sind'],0,'Geliefert ist die sachliche, Angaben die formale Prüfung.'],
- 'm3-1':['Warum korrigierst du Fehler auf einer Rechnung nie selbst?',['Weil es zu lange dauert','Weil die Rechnung im Original erhalten bleiben muss','Weil das nur die Bank darf'],1,'Du forderst beim Lieferanten eine korrigierte Rechnung an.'],
- 'm4-0':['Ab welchem Betrag verlangt d.velop smart invoice beim Vier-Augen-Prinzip eine zweite Person?',['Über 1.000 €','Über 10.000 €','Über 100.000 €'],1,'Über 10.000 € ist immer eine zweite Person nötig.'],
- 'm5-0':['Wie lange bewahrst du Rechnungen seit 2025 auf?',['Sechs Jahre','Zehn Jahre','Acht Jahre'],2,'Seit 1. Januar 2025 gelten für Buchungsbelege acht Jahre.'],
- 'm5-1':['Eine Rechnung kam im November 2026. Ab wann darf sie frühestens weg?',['Ab November 2034','Ab Anfang 2035','Ab Anfang 2037'],1,'Die Frist beginnt erst am Ende des Jahres 2026 und läuft dann acht Jahre.'],
- 'm5-2':['Was musst du bei einer E-Rechnung auf jeden Fall aufbewahren?',['Die XML-Datei','Einen Ausdruck','Nur die PDF-Ansicht'],0,'Wichtig ist der strukturierte Teil, ein Ausdruck reicht nicht.'],
- 'm6-0':['Braucht ein kleiner Betrieb mit elektronischer Ablage eine Verfahrensdokumentation?',['Nein, erst ab 50 Beschäftigten','Nur mit Steuerberater','Ja, egal wie klein'],2,'Jedes Unternehmen, das Belege elektronisch aufbewahrt, braucht sie.'],
- 'm7-0':['Seit wann müssen alle Unternehmen E-Rechnungen empfangen können?',['Seit 2025','Ab 2027','Ab 2028'],0,'Die Empfangspflicht gilt seit 1. Januar 2025.'],
- 'm7-1':['Müssen Kleinunternehmer E-Rechnungen empfangen können?',['Nein','Ja','Erst ab 2028'],1,'Ausstellen müssen sie nicht, empfangen schon.'],
- 'm7-2':['Was zählt bei ZUGFeRD laut IHK Koblenz?',['Das Bild im PDF','Der strukturierte Teil','Beides gleich'],1,'Bei hybriden Formaten zählt nur der strukturierte Teil.'],
- 'm8-0':['Eine E-Mail mit PDF-Anhang ist …',['eine sonstige Rechnung','eine E-Rechnung','eine Kleinbetragsrechnung'],0,'Eine PDF zeigt nur an, sie enthält keine strukturierten Daten.'],
- 'm9-0':['Was steht in BT-112?',['Die Rechnungsnummer','Das Fälligkeitsdatum','Die Summe mit Steuer'],2,'BT-1 ist die Rechnungsnummer, BT-9 das Fälligkeitsdatum.'],
- 'm9-1':['Was steht bei Rechnungen an Behörden in BT-10?',['Die Leitweg-ID','Die IBAN','Das Lieferdatum'],0,'Zwischen Firmen reicht dort ein Platzhalter.'],
- 'm9-2':['Was ist am Muster der Bundesagentur für Arbeit besonders?',['Es ist ein Antragsformular','Jedes Feld ist mit seiner BT-Nummer markiert','Es zeigt eine Gehaltsabrechnung'],1,'Deshalb lohnt sich hier der Blick auf das Original.'],
- 'm10-0':['Welche ZUGFeRD-Profile sind keine gültige E-Rechnung?',['EN 16931 und EXTENDED','XRECHNUNG','MINIMUM und BASIC WL'],2,'Ihnen fehlen die Rechnungspositionen.'],
- 'm10-1':['Ab welcher ZUGFeRD-Version zählt das Format als E-Rechnung?',['1.0','2.0.1','3.0'],1,'Version 1.0 entspricht der Norm noch nicht.'],
- 'm11-0':['Wo findest du fertige ZUGFeRD-Beispieldateien?',['Beim FeRD unter „ZUGFeRD-Beispielrechnungen“','Beim Finanzamt per Post','Nirgends, man muss sie selbst bauen'],0,'Die Beispiele kann man dort herunterladen.'],
- 'm11-1':['Was kann der Viewer in ELSTER?',['E-Rechnungen erstellen','E-Rechnungen anzeigen und prüfen','Rechnungen bezahlen'],1,'Erstellen kann er keine Rechnungen.'],
- 'm12-0':['Was macht die Einstellung „Auswahl anbieten“?',['Alle Treffer bekommen die Aufgabe','Die Software wählt zufällig','Die Person im vorigen Schritt wählt aus'],2,'„Alle Treffer verwenden“ gibt die Aufgabe an alle.'],
- 'm12-1':['Was legt der Onboarding-Assistent in d.velop smart invoice an?',['Einen Ablauf mit Verteilung, Prüfung, Freigabe und Buchhaltung','Eine Steuererklärung','Eine Internetseite'],0,'Danach passt man den Ablauf an den eigenen Betrieb an.']};
-
-/* ---------- Zustand ---------- */
-const KEY='reise-der-rechnung-v1';
-const blank=()=>({done:{},tasks:{},tests:{},known:[],order:[],read:{},ans:{},sol:{},hq:{}});
-let S=blank();
-try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x)S={...S,...x}}catch(e){}
-let dbRef=null,saving=false,again=false,timer=null;
-const merge=o=>{if(!o)return;for(const k of ['done','tasks','read','sol','hq'])S[k]={...(o[k]||{}),...S[k]};S.ans={...(o.ans||{}),...S.ans};
- for(const k in o.tests||{})S.tests[k]=Math.max(S.tests[k]||0,o.tests[k]);
- S.known=[...new Set([...(o.known||[]),...S.known])];if(!S.order.length&&o.order)S.order=o.order;migrate()};
-async function flush(){if(!dbRef)return;if(saving){again=true;return}saving=true;
- try{await dbRef.set(JSON.parse(JSON.stringify(S)))}catch(e){}saving=false;if(again){again=false;flush()}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(timer);timer=setTimeout(flush,800)}
-
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-/* Häppchen: jeder Pflichttext und das Rätsel */
-const units=m=>[...m.texte.map((t,i)=>({kind:'read',k:m.id+'-'+i,t,i})).filter(u=>!u.t.opt),{kind:'raetsel',k:m.id+'-r'}];
-const uDone=(m,u)=>u.kind==='read'?!!S.hq[u.k]:!!S.sol[m.id];
-const mDone=m=>units(m).every(u=>uDone(m,u));
-const mCount=m=>{const us=units(m);return [us.filter(u=>uDone(m,u)).length,us.length]};
-const unlocked=m=>m.n===1||mDone(M[m.n-2])||mCount(m)[0]>0;
-const stufeRead=n=>M.filter(m=>m.s===n).every(m=>units(m).filter(u=>u.kind==='read').every(u=>uDone(m,u)));
-const passed=n=>(S.tests[n]||0)>=3;
-const stufeDone=n=>M.filter(m=>m.s===n).every(mDone)&&passed(n);
-function stufeProg(n){let d=0,t=0;M.filter(m=>m.s===n).forEach(m=>{const [a,b]=mCount(m);d+=a;t+=b});t++;if(passed(n))d++;return [d,t]}
-function totalProg(){let d=0,t=0;[1,2,3].forEach(n=>{const [a,b]=stufeProg(n);d+=a;t+=b});return [d,t]}
-const pct=([a,b])=>Math.round(a/b*100);
-const uMin=u=>u.kind==='raetsel'?'5 Min':u.t.src==='Kurs'?'2 Min':u.t.full?'6 Min':u.t.empf?'4 Min, mit ganzem Text ca. 15 Min':'4 Min';
-/* alten Fortschritt übernehmen */
-function migrate(){M.forEach(m=>{units(m).forEach(u=>{if(u.kind==='read'&&(S.read[u.k]||S.done[m.id]))S.hq[u.k]=true});if(S.done[m.id])S.sol[m.id]=true})}
-migrate();
-const nextUnit=()=>{for(const m of M){for(const u of units(m))if(!uDone(m,u))return {m,u}}return null};
-
-/* ---------- Bild ---------- */
-const pic=document.getElementById('pic');
-function drawPic(){
- const st=[1,2,3].map(stufeDone);
- const dots=M.map((m,i)=>{const x=40+i*(480/11),on=mDone(m);
-  return `<circle cx="${x}" cy="384" r="${on?9:7}" fill="${on?'var(--red)':'var(--bg)'}" stroke="${on?'var(--red)':'var(--soft)'}" stroke-width="2"/>`}).join('');
- const gaps=[4,8].map(k=>{const x=40+(k-.5)*(480/11);return `<line x1="${x}" x2="${x}" y1="370" y2="398" stroke="var(--soft)" stroke-width="1"/>`}).join('');
- const stamp=(i,x,y,r,txt)=>`<g class="stamp ${st[i]?'on':''}" transform="rotate(${r} ${x} ${y})"><rect x="${x-78}" y="${y-24}" width="156" height="48" rx="6" fill="none" stroke="var(--red)" stroke-width="4"/><text x="${x}" y="${y+9}" text-anchor="middle" font-family="Sofia Sans Condensed,sans-serif" font-weight="800" font-size="26" fill="var(--red)" letter-spacing="1">${txt}</text></g>`;
- const lines=[150,172,194].map(y=>`<rect x="128" y="${y}" width="${y===172?190:240}" height="8" rx="4" fill="var(--line)"/>`).join('');
- pic.innerHTML=`
- <rect x="104" y="22" width="352" height="320" rx="6" fill="var(--line)" transform="translate(6 8)" opacity=".7"/>
- <rect x="104" y="22" width="352" height="320" rx="6" fill="var(--paper)" stroke="var(--line)"/>
- <text x="128" y="62" font-family="Sofia Sans Condensed,sans-serif" font-weight="800" font-size="20" fill="var(--ink)">Holzspielzeug Nordwind GmbH</text>
- <text x="128" y="88" font-size="14" fill="var(--soft)">Rechnung Nr. 2026-0417</text>
- <line x1="128" x2="432" y1="112" y2="112" stroke="var(--line)"/>
- <text x="128" y="136" font-size="13" fill="var(--soft)">Spielküche, 3 Kisten Bausteine</text>
- ${lines}
- <line x1="128" x2="432" y1="228" y2="228" stroke="var(--line)"/>
- <text x="128" y="256" font-size="14" fill="var(--soft)">netto 1.200,00 €  ·  USt 228,00 €</text>
- <text x="128" y="296" font-family="Sofia Sans Condensed,sans-serif" font-weight="800" font-size="34" fill="var(--ink)">1.428,00 €</text>
- ${stamp(0,350,150,-12,STUFEN[0].stamp)}${stamp(1,330,230,7,STUFEN[1].stamp)}${stamp(2,345,305,-5,STUFEN[2].stamp)}
- <line x1="40" x2="520" y1="384" y2="384" stroke="var(--line)" stroke-width="3"/>${gaps}${dots}
- <text x="40" y="414" font-size="12" fill="var(--soft)">Briefkasten</text><text x="520" y="414" font-size="12" fill="var(--soft)" text-anchor="end">Archiv</text>`;
+function newWord(lessonId, en, de) {
+  return { id: uid(), lessonId, en: en.trim(), de: de.trim(), box: 0, due: 0, right: 0, wrong: 0, last: 0 };
+}
+function applySRS(w, ok) {
+  if (ok) { w.box = Math.min(5, (w.box || 0) + 1); w.right = (w.right || 0) + 1; }
+  else { w.box = 1; w.wrong = (w.wrong || 0) + 1; }
+  w.due = startOfDay() + INTERVALS[w.box] * DAY;
+  w.last = Date.now();
+}
+function bumpStreak() {
+  const t = todayStr(); if (S.streak.last === t) return;
+  const y = todayStr(new Date(Date.now() - DAY));
+  S.streak.count = S.streak.last === y ? S.streak.count + 1 : 1;
+  S.streak.last = t;
+}
+function streak() {
+  const t = todayStr(), y = todayStr(new Date(Date.now() - DAY));
+  return (S.streak.last === t || S.streak.last === y) ? S.streak.count : 0;
 }
 
-/* ---------- Missionen ---------- */
-const vm=document.getElementById('v-missionen');
-const HOWTO=`<details class="howto"><summary><h2>So geht's</h2></summary><p>Der Kurs besteht aus kurzen Häppchen von 2 bis 5 Minuten. Du kannst nach jedem Häppchen aufhören, die App merkt sich, wo du warst.</p><ol>
-<li><b>Lesehäppchen.</b> Lies die Zusammenfassung eines Textes. Wo „Ganzen Text lesen empfohlen“ steht, nimm dir etwas mehr Zeit und lies den ganzen Text. Danach beantwortest du eine Kontrollfrage. Ist sie richtig, ist das Häppchen geschafft.</li>
-<li><b>Rätselhäppchen.</b> Am Ende jeder Mission schreibst du deine Antwort auf das Rätsel und vergleichst sie mit der Lösung.</li>
-<li><b>Stufentest.</b> Sind alle Lesehäppchen einer Stufe geschafft, öffnet sich der Test. Mit drei richtigen Antworten bekommt die Rechnung oben ihren Stempel.</li></ol>
-<p class="muted">Die Aufgaben für deinen eigenen Betrieb stehen im Reiter „Praxis“. Die kannst du erledigen, wann es passt.</p></details>`;
-const openUnits=new Set();
-function readUnit(m,u,state){
- const t=u.t,q=KQ[u.k],done=state==='done';
- const head=`<div class="uhead"><span class="ubadge">${done?'geschafft':'Lesen · '+uMin(u)}</span><b>${t.t}</b>${t.empf?'<span class="empf">Ganzen Text lesen empfohlen</span>':''}</div>`;
- if(state==='locked')return `<div class="unit locked"><div class="uhead"><span class="ubadge">Lesen</span><b>${t.t}</b></div></div>`;
- if(done&&!openUnits.has(u.k))return `<div class="unit done">${head}<button class="linkbtn" data-peek="${u.k}">Noch einmal ansehen</button></div>`;
- return `<div class="unit ${done?'done':'now'}" id="u-${u.k}">${head}
-  <div class="src">${t.src}</div>
-  ${t.empf&&t.why?`<p class="why2">${t.why}</p>`:''}
-  <div class="sum"><small>${t.full||t.u?'Zusammenfassung':'Text'}</small>${t.sum}</div>
-  ${t.warn?`<div class="warnbox">Achtung: ${t.warn}</div>`:''}
-  ${t.full?`<details class="full" ${t.empf&&!done?'open':''}><summary>Ganzen Text lesen</summary>${t.full}</details>`:''}
-  ${t.u?`<div class="row"><a class="btn" href="${t.u}" target="_blank" rel="noopener">Ganzen Text öffnen</a></div>`:''}
-  ${q?`<div class="kq"><p><b>Kontrollfrage:</b> ${q[0]}</p>${q[1].map((o,j)=>`<label class="optn ${done&&j===q[2]?'right':''}"><input type="radio" name="kq-${u.k}" value="${j}" ${done&&j===q[2]?'checked':''} ${done?'disabled':''}><span>${o}</span></label>`).join('')}
-   <div class="kqmsg" id="msg-${u.k}">${done?'Richtig. '+q[3]:''}</div>
-   ${done?`<button class="linkbtn" data-hide="${u.k}">Zuklappen</button>`:`<div class="row"><button class="btn main" data-kq="${u.k}">Antwort prüfen</button></div>`}</div>`:''}
- </div>`;
+// ---------- Vergleich der Antworten ----------
+function norm(s, lang) {
+  s = String(s).toLowerCase()
+    .replace(/[’`´‘]/g, "'")
+    .replace(/\(.*?\)/g, ' ')
+    .replace(/[.!?¡¿"„“”…]/g, '')
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/\s+/g, ' ').trim();
+  if (lang === 'en') s = s.replace(/^(to|a|an|the) /, '');
+  else s = s.replace(/^(der|die|das|ein|eine|einen|sich) /, '');
+  return s;
 }
-function riddleUnit(m,state){
- const sol=S.sol[m.id];
- if(state==='locked')return `<div class="unit locked"><div class="uhead"><span class="ubadge">Rätsel</span><b>Das Rätsel der Mission</b></div></div>`;
- const nx=M[m.n];
- return `<div class="unit ${sol?'done':'now'}" id="u-${m.id}-r"><div class="uhead"><span class="ubadge">${sol?'geschafft':'Rätsel · 5 Min'}</span><b>Das Rätsel der Mission</b></div>
-  <div class="raetsel"><b>Rätsel</b>${m.r}</div>
-  ${sol?`<div class="mine"><small>Deine Antwort</small>${esc(S.ans[m.id]||'')}</div><div class="loes"><small>Lösung</small>${m.l}</div>
-   <div class="row"><button class="btn" data-redo="${m.id}">Antwort ändern</button>${nx&&!mDone(nx)?`<button class="btn main" data-go="${nx.id}">Weiter mit Mission ${nx.n}</button>`:''}</div>`:
-  `<label for="a-${m.id}" class="muted">Deine Antwort</label><textarea id="a-${m.id}" data-ans="${m.id}" placeholder="Schreib hier deine Antwort, ein paar Wörter reichen.">${esc(S.ans[m.id]||'')}</textarea>
-   <div class="row"><button class="btn main" data-give="${m.id}">Antwort abgeben und Lösung zeigen</button></div>`}
- </div>`;
+const alts = f => String(f).split(/[\/,;]/).map(x => x.trim()).filter(Boolean);
+function lev(a, b) {
+  if (a === b) return 0;
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  let prev = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) {
+    const cur = [i];
+    for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[n];
 }
-function missionBody(m){
- const us=units(m);let seenOpen=false;
- const opt=m.texte.filter(t=>t.opt);
- return `<div class="body">${us.map(u=>{const d=uDone(m,u);let st=d?'done':seenOpen?'locked':'now';if(!d)seenOpen=true;
-   return u.kind==='read'?readUnit(m,u,st):riddleUnit(m,st)}).join('')}
-  ${opt.length?`<div class="optbox"><b>Freiwillig zum Weiterlesen</b>${opt.map(t=>`<p><a href="${t.u}" target="_blank" rel="noopener">${t.t}</a> <span class="src">${t.src}</span></p><div class="sum">${t.sum}</div>${t.warn?`<div class="warnbox">Achtung: ${t.warn}</div>`:''}`).join('')}</div>`:''}
-  <p class="muted">Praxisaufgabe zu dieser Mission: ${m.a[0]}${m.a.length>1?' und '+(m.a.length-1)+' weitere':''}. Du findest sie im Reiter „Praxis“.</p>
- </div>`;
+function check(input, field, lang) {
+  const a = norm(input, lang); if (!a) return { ok: false };
+  // Jede Variante einmal ohne und einmal mit dem Inhalt der Klammern, damit "lots" und "lots of" bei "lots (of)" zählen
+  const raw = [field, ...alts(field)];
+  const list = [...new Set(raw.flatMap(x => [norm(x, lang), norm(x.replace(/[()]/g, ''), lang)]))].filter(Boolean);
+  if (list.includes(a)) return { ok: true, exact: true };
+  for (const t of list) {
+    const tol = t.length >= 8 ? 2 : t.length >= 4 ? 1 : 0;
+    if (lev(a, t) <= tol) return { ok: true, exact: false };
+  }
+  return { ok: false };
 }
-const pbar=(p,cls='')=>`<span class="mbar ${cls}"><i style="width:${p}%"></i></span>`;
-function renderMissions(){
- const open=new Set([...vm.querySelectorAll('details.m[open]')].map(d=>d.dataset.id));
- const nu=nextUnit();if(!vm.dataset.init&&nu)open.add(nu.m.id);vm.dataset.init=1;
- vm.innerHTML=(totalProg()[0]?HOWTO:HOWTO.replace('<details class="howto">','<details class="howto" open>'))+STUFEN.map(st=>{
-  const ms=M.filter(m=>m.s===st.n),sp=stufeProg(st.n),p=pct(sp);
-  return `<div class="stufe"><header><h2>Stufe ${st.n}: ${st.name}</h2><span class="badge ${stufeDone(st.n)?'ok':''}">${stufeDone(st.n)?'Stempel erhalten':p+' %'}</span><p>${st.text}</p>${pbar(p,'big')}</header>
-  ${ms.map(m=>{const d=mDone(m),[a,b]=mCount(m),mp=Math.round(a/b*100);
-   if(!unlocked(m))return `<div class="m locked"><div class="lockrow"><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${b} Häppchen · öffnet sich nach Mission ${m.n-1}</small></span><span class="badge">gesperrt</span></div></div>`;
-   return `<details class="m ${d?'done':''} ${nu&&nu.m.id===m.id?'cur':''}" data-id="${m.id}" ${open.has(m.id)?'open':''}>
-   <summary><span class="num">${m.n}</span><span class="mt">Mission ${m.n}: ${m.t}<small>${a} von ${b} Häppchen · ${mp} %</small>${pbar(mp)}</span><span class="badge ${d?'ok':''}">${d?'erledigt':nu&&nu.m.id===m.id?'als Nächstes':mp+' %'}</span></summary>
-   ${missionBody(m)}</details>`}).join('')}
-  <div class="row"><button class="btn" data-gotest="${st.n}" ${stufeRead(st.n)?'':'disabled'}>Stufentest ${st.n}${stufeRead(st.n)?' machen':' (erst alle Lesehäppchen)'}${S.tests[st.n]!=null?' · bisher '+S.tests[st.n]+' von 4':''}</button></div></div>`}).join('');
-}
-function rerenderKeepScroll(){const y=scrollY;renderAll();scrollTo(0,y)}
-function goTo(id){const d=vm.querySelector(`details[data-id="${id.split('-')[0]}"]`);if(d)d.open=true;const el=document.getElementById('u-'+id)||d;if(el){el.scrollIntoView({block:'start'});scrollBy(0,-64)}}
-vm.addEventListener('click',e=>{
- const b=e.target.closest('button');if(!b)return;
- if(b.dataset.kq){const k=b.dataset.kq,q=KQ[k],sel=vm.querySelector(`input[name="kq-${k}"]:checked`),msg=document.getElementById('msg-'+k);
-  if(!sel){msg.className='kqmsg bad';msg.textContent='Wähle zuerst eine Antwort aus.';return}
-  if(+sel.value===q[2]){S.hq[k]=true;save();const y=scrollY;renderAll();scrollTo(0,y);const n=nextUnit();if(n&&n.m.id===k.split('-')[0]){goTo(n.u.kind==='read'?n.u.k:n.m.id+'-r')}}
-  else{msg.className='kqmsg bad';msg.textContent='Nicht ganz. Lies die Zusammenfassung noch einmal und versuch es erneut.';sel.closest('.optn').classList.add('wrong')}}
- if(b.dataset.give){const id=b.dataset.give,ta=vm.querySelector(`textarea[data-ans="${id}"]`),v=(ta&&ta.value||'').trim();
-  if(v.length<2){ta.focus();ta.placeholder='Schreib zuerst eine Antwort, auch eine Vermutung zählt.';return}
-  S.ans[id]=v;S.sol[id]=true;save();rerenderKeepScroll()}
- if(b.dataset.redo){delete S.sol[b.dataset.redo];save();rerenderKeepScroll()}
- if(b.dataset.go){const id=b.dataset.go;const cur=vm.querySelector('details.m[open]');renderAll();vm.querySelectorAll('details.m[open]').forEach(d=>{if(d.dataset.id!==id)d.open=false});goTo(id)}
- if(b.dataset.peek){openUnits.add(b.dataset.peek);rerenderKeepScroll()}
- if(b.dataset.hide){openUnits.delete(b.dataset.hide);rerenderKeepScroll()}
- if(b.dataset.gotest){show('tests');pickTest(+b.dataset.gotest);scrollTo(0,document.getElementById('v-tests').offsetTop-60)}
-});
-vm.addEventListener('change',e=>{if(e.target.name&&e.target.name.startsWith('kq-')){const m=document.getElementById('msg-'+e.target.name.slice(3));if(m){m.textContent='';m.className='kqmsg'}vm.querySelectorAll(`input[name="${e.target.name}"]`).forEach(i=>i.closest('.optn').classList.remove('wrong'))}});
-vm.addEventListener('input',e=>{const id=e.target.dataset.ans;if(id){S.ans[id]=e.target.value;save()}});
 
-/* ---------- Praxis ---------- */
-const vp=document.getElementById('praxisBox');
-function renderPraxis(){
- const all=M.flatMap(m=>m.a.map((t,i)=>m.id+'-'+i)),dn=all.filter(k=>S.tasks[k]).length;
- document.getElementById('praxisCount').textContent=`${dn} von ${all.length} erledigt`;
- vp.innerHTML=M.map(m=>`<div class="pgroup"><h3>Mission ${m.n}: ${m.t}</h3>${m.a.map((t,i)=>{const k=m.id+'-'+i;return `<label class="task"><input type="checkbox" data-task="${k}" ${S.tasks[k]?'checked':''}><span>${t}</span></label>`}).join('')}</div>`).join('');
+// ---------- Sprachausgabe ----------
+const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+let voices = [], speechUnlocked = false;
+const keepUtter = []; // Safari verwirft sonst manchmal Äußerungen, bevor sie gesprochen werden
+// Spaßstimmen von Apple, die nicht automatisch gewählt werden sollen
+const NOVELTY = /albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox/i;
+const PREFERRED = /daniel|serena|kate|arthur|martha|stephanie|oliver|google uk english/i;
+function loadVoices() {
+  if (!canSpeak) return;
+  voices = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang.replace('_', '-')));
 }
-vp.addEventListener('change',e=>{const k=e.target.dataset.task;if(!k)return;if(e.target.checked)S.tasks[k]=true;else delete S.tasks[k];save();renderPraxis()});
+if (canSpeak) {
+  loadVoices();
+  speechSynthesis.addEventListener ? speechSynthesis.addEventListener('voiceschanged', () => { loadVoices(); if (view === 'more') render(); })
+    : (speechSynthesis.onvoiceschanged = () => { loadVoices(); if (view === 'more') render(); });
+}
+function pickVoice() {
+  if (!voices.length) loadVoices();
+  const gb = v => /^en[-_]gb/i.test(v.lang), us = v => /^en[-_]us/i.test(v.lang), ok = v => !NOVELTY.test(v.name);
+  return voices.find(v => v.voiceURI === S.settings.voice)
+    || voices.find(v => gb(v) && PREFERRED.test(v.name))
+    || voices.find(v => gb(v) && ok(v))
+    || voices.find(v => us(v) && ok(v))
+    || voices.find(ok) || null;
+}
+// iOS spricht erst, nachdem einmal direkt bei einem Antippen gesprochen wurde
+function unlockSpeech() {
+  if (speechUnlocked || !canSpeak) return;
+  speechUnlocked = true;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; keepUtter.push(u); speechSynthesis.speak(u); } catch (e) {}
+}
+document.addEventListener('touchend', unlockSpeech, { passive: true });
+document.addEventListener('click', unlockSpeech);
+function speak(text, rate = 0.9) {
+  if (!canSpeak || !text) return;
+  const synth = speechSynthesis;
+  const u = new SpeechSynthesisUtterance(String(text).replace(/\//g, ', ').replace(/[()…]/g, ''));
+  const v = pickVoice();
+  if (v) { u.voice = v; u.lang = v.lang.replace('_', '-'); } else u.lang = 'en-GB';
+  u.rate = rate; u.volume = 1;
+  u.onerror = e => { if (e.error && !['interrupted', 'canceled'].includes(e.error)) toast('Vorlesen hat nicht geklappt (' + e.error + ')'); };
+  keepUtter.push(u); if (keepUtter.length > 6) keepUtter.shift();
+  speechUnlocked = true;
+  // Direkt nach cancel() verschluckt Safari die nächste Ausgabe, deshalb kurz warten
+  if (synth.speaking || synth.pending) { synth.cancel(); setTimeout(() => { synth.resume(); synth.speak(u); }, 120); }
+  else { synth.resume(); synth.speak(u); }
+}
+const speakId = (id, rate) => { const w = word(id); if (w) speak(w.en, rate); };
 
-/* ---------- Tests ---------- */
-let curTest=1;
-const tp=document.getElementById('testPick'),tb=document.getElementById('testBox');
-function pickTest(n){curTest=n;renderTest()}
-const pickHtml=()=>STUFEN.map(s=>`<button class="btn" aria-pressed="${s.n===curTest}" data-t="${s.n}">Stufe ${s.n}: ${s.name}${S.tests[s.n]!=null?' · '+S.tests[s.n]+'/4':''}</button>`).join('');
-function renderTest(){
- tp.innerHTML=pickHtml();
- if(!stufeRead(curTest)){const miss=M.filter(m=>m.s===curTest&&!units(m).filter(u=>u.kind==='read').every(u=>uDone(m,u))).map(m=>m.n);
-  tb.innerHTML=`<div class="lockbox">Dieser Test öffnet sich, wenn alle Lesehäppchen der Stufe ${curTest} geschafft sind. Es fehlen noch Häppchen in ${miss.length===1?'Mission':'den Missionen'} ${miss.join(', ')}.</div>`;return}
- tb.innerHTML=Q[curTest].map((q,i)=>`<div class="q" data-q="${i}"><p>${i+1}. ${q[0]}</p>${q[1].map((o,j)=>`<label class="optn"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}<div class="why">${q[3]}</div></div>`).join('')+
- `<div class="result" id="res"></div><div class="row"><button class="btn main" id="check">Auswerten</button><button class="btn" id="again">Neu versuchen</button></div>`;
+// ---------- Navigation ----------
+let view = 'practice';
+function go(v) { view = v; editId = null; render(); window.scrollTo(0, 0); }
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); }
+
+function render() {
+  let title = 'Vokabeltrainer', left = '', right = '', body = '', tab = view, nonav = false;
+  if (view === 'practice') body = viewPractice();
+  else if (view === 'words') { title = 'Vokabeln'; body = viewWords(); }
+  else if (view.startsWith('lesson:')) {
+    const l = lesson(view.slice(7));
+    if (!l) { view = 'words'; return render(); }
+    title = l.name; tab = 'words';
+    left = `<button onclick="go('words')">‹ Zurück</button>`;
+    body = viewLesson(l);
+  }
+  else if (view === 'select') { title = 'Wörter auswählen'; tab = 'practice'; left = `<button onclick="go('practice')">‹ Zurück</button>`; body = viewSelect(); }
+  else if (view === 'import') { title = 'Vokabeln einfügen'; body = viewImport(); }
+  else if (view === 'more') { title = 'Mehr'; body = viewMore(); }
+  else if (view === 'session') { title = SES.label; right = `<button onclick="quitSession()">Beenden</button>`; body = viewSession(); nonav = true; }
+  else if (view === 'result') { title = 'Runde geschafft'; tab = 'practice'; body = viewResult(); }
+
+  $('#hd').innerHTML = `${left}<h1>${esc(title)}</h1>${right}`;
+  $('#main').innerHTML = body + (view === 'more' ? '' : '');
+  document.body.classList.toggle('nonav', nonav);
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  afterRender();
 }
-tp.addEventListener('click',e=>{const b=e.target.closest('button');if(b)pickTest(+b.dataset.t)});
-tb.addEventListener('click',e=>{
- if(e.target.id==='again'){renderTest();return}
- if(e.target.id!=='check')return;
- let ok=0,miss=0;Q[curTest].forEach((q,i)=>{const box=tb.querySelector(`[data-q="${i}"]`),sel=box.querySelector('input:checked');
-  if(!sel){miss++;return}box.classList.add('checked');
-  box.querySelectorAll('.optn').forEach((o,j)=>{o.classList.toggle('right',j===q[2]);o.classList.toggle('wrong',j===+sel.value&&j!==q[2])});
-  if(+sel.value===q[2])ok++});
- const r=document.getElementById('res');
- if(miss){r.textContent=`Noch ${miss} ${miss===1?'Frage':'Fragen'} offen.`;return}
- S.tests[curTest]=Math.max(S.tests[curTest]||0,ok);save();
- const ms=M.filter(m=>m.s===curTest&&!mDone(m)).length;
- r.textContent=`${ok} von 4 richtig. `+(ok>=3?(ms?`Bestanden. Für den Stempel fehlen noch Rätsel in ${ms} ${ms===1?'Mission':'Missionen'} dieser Stufe.`:'Bestanden, der Stempel ist deiner.'):'Für den Stempel braucht es drei richtige. Lies die Erklärungen und versuch es noch einmal.');
- renderTop();renderMissions();tp.innerHTML=pickHtml();
+function afterRender() {
+  document.querySelectorAll('[data-partial]').forEach(e => e.indeterminate = true);
+  if (view === 'session') {
+    const it = cur();
+    if (!SES.answered) {
+      const inp = $('#ans'); if (inp) inp.focus();
+      if (it.type === 'listen' && !it.spoken) { it.spoken = true; setTimeout(() => speakId(it.id), 150); }
+    } else { const n = $('#nextBtn'); if (n) n.focus({ preventScroll: true }); }
+  }
+}
+document.addEventListener('keydown', e => {
+  if (view === 'session' && SES && SES.answered && e.key === 'Enter' && !['INPUT', 'BUTTON', 'TEXTAREA'].includes(e.target.tagName)) { e.preventDefault(); next(); }
 });
 
-/* ---------- Karteikarten ---------- */
-const cb=document.getElementById('cardBox');
-function deck(){if(S.order.length!==C.length)S.order=C.map((_,i)=>i);return S.order.filter(i=>!S.known.includes(i))}
-function renderCards(){
- const d=deck();
- if(!d.length){cb.innerHTML=`<p class="result">Alle ${C.length} Karten gewusst.</p><div class="row"><button class="btn main" id="cReset">Stapel neu mischen</button></div>`;return}
- const i=d[0];
- cb.innerHTML=`<p class="muted">Noch ${d.length} von ${C.length} Karten im Stapel</p>
- <div class="card" id="card" role="button" tabindex="0" aria-label="Karte umdrehen"><div class="in"><div class="face"><small>Frage</small><div>${C[i][0]}</div></div><div class="face back"><small>Antwort</small><div>${C[i][1]}</div></div></div></div>
- <div class="row"><button class="btn main" id="cKnow">Wusste ich</button><button class="btn" id="cAgain">Nochmal</button><button class="btn" id="cReset">Stapel neu mischen</button></div>`;
+function seg(key, options) {
+  return `<div class="seg${options.length >= 4 ? ' four' : ''}">${options.map(([v, l]) => `<button class="${String(S.settings[key]) === String(v) ? 'on' : ''}" onclick="setSetting('${key}','${v}')">${l}</button>`).join('')}</div>`;
 }
-cb.addEventListener('click',e=>{
- const card=e.target.closest('#card');if(card){card.classList.toggle('flip');return}
- const d=deck(),i=d[0];
- if(e.target.id==='cKnow'){S.known.push(i);save();renderCards();renderTop()}
- if(e.target.id==='cAgain'){S.order=[...S.order.filter(x=>x!==i),i];save();renderCards()}
- if(e.target.id==='cReset'){S.known=[];S.order=C.map((_,k)=>k).sort(()=>Math.random()-.5);save();renderCards();renderTop()}
-});
-cb.addEventListener('keydown',e=>{if(e.target.id==='card'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.target.classList.toggle('flip')}});
+function setSetting(k, v) { S.settings[k] = (k === 'size') ? Number(v) : v; save(); render(); }
+function dots(box) { let h = '<span class="dots">'; for (let i = 1; i <= 5; i++) h += `<i class="${i <= (box || 0) ? 'f' : ''}"></i>`; return h + '</span>'; }
 
-/* ---------- Kopf, Reiter, Reset ---------- */
-function renderTop(){
- const tp_=totalProg(),p=pct(tp_);
- document.getElementById('sPct').textContent=p+' %';
- document.getElementById('sPctSub').textContent=`${tp_[0]} von ${tp_[1]} Schritten geschafft`;
- document.getElementById('pbar').style.width=p+'%';
- document.getElementById('stufenProg').innerHTML=STUFEN.map(s=>{const sp=stufeProg(s.n),q=pct(sp);return `<div class="sprow"><span>Stufe ${s.n}: ${s.name}</span>${pbar(q)}<b>${q} %</b></div>`}).join('');
- const nu=nextUnit(),open=[1,2,3].find(n=>!passed(n)&&stufeRead(n));
- let html;
- if(nu){const lbl=nu.u.kind==='read'?nu.u.t.t:'Das Rätsel der Mission';html=`<small>Als Nächstes · Mission ${nu.m.n}, ${uMin(nu.u)}</small>${lbl}<div class="row"><button class="btn main" id="goNext">Weiterlernen</button></div>`}
- else if(open)html=`<small>Als Nächstes</small>Stufentest ${open} bestehen<div class="row"><button class="btn main" id="goTest" data-n="${open}">Zum Test</button></div>`;
- else html=`<small>Fertig</small>Alle Häppchen und Tests geschafft`;
- const t=[1,2,3].find(n=>stufeRead(n)&&!passed(n)&&(!nu||nu.m.s>n));
- if(nu&&t)html+=`<p class="muted" style="margin:8px 0 0">Der Stufentest ${t} ist offen. <button class="linkbtn" id="goTest" data-n="${t}">Zum Test</button></p>`;
- document.getElementById('next').innerHTML=html;
- document.getElementById('cert').classList.toggle('on',[1,2,3].every(stufeDone));
- drawPic();
+// ---------- Üben ----------
+function modeHint() {
+  return {
+    auto: 'Neue Wörter kommen erst mit Antworten zum Auswählen. Sobald sie besser sitzen, musst du sie eintippen, und gut gelernte Wörter werden manchmal nur vorgelesen.',
+    mc: 'Vier Antworten, eine davon stimmt.',
+    type: 'Du tippst die Antwort selbst ein. Kleine Tippfehler und Groß- und Kleinschreibung zählen nicht als Fehler.',
+    listen: 'Das englische Wort wird vorgelesen und du schreibst es auf. Die Richtung spielt dabei keine Rolle.'
+  }[S.settings.mode];
 }
-document.getElementById('next').addEventListener('click',e=>{
- if(e.target.id==='goNext'){show('missionen');const nu=nextUnit();if(!nu)return;renderMissions();vm.querySelectorAll('details.m[open]').forEach(d=>{if(d.dataset.id!==nu.m.id)d.open=false});goTo(nu.u.kind==='read'?nu.u.k:nu.m.id+'-r')}
- if(e.target.id==='goTest'){show('tests');pickTest(+e.target.dataset.n);scrollTo(0,document.getElementById('v-tests').offsetTop-60)}
-});
-function renderAll(){renderTop();renderMissions()}
-function show(v){document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===v));
- ['missionen','tests','karten','praxis'].forEach(k=>document.getElementById('v-'+k).hidden=k!==v);
- if(v==='karten')renderCards();if(v==='tests')renderTest();if(v==='praxis')renderPraxis()}
-document.querySelector('nav.tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)show(t.dataset.v)});
-const rs=document.getElementById('reset');let armed=false;
-rs.addEventListener('click',()=>{if(!armed){armed=true;rs.textContent='Wirklich alles zurücksetzen?';setTimeout(()=>{armed=false;rs.textContent='Fortschritt zurücksetzen'},4000);return}
- S=blank();openUnits.clear();armed=false;rs.textContent='Fortschritt zurücksetzen';save();vm.dataset.init='';renderAll();renderTest();renderCards();renderPraxis()});
-
-renderAll();renderTest();renderPraxis();
-
-/* ---------- Speichern im Konto ---------- */
-(async()=>{
- try{
-  for(let i=0;i<30&&!(window.claude&&window.claude.use);i++)await new Promise(r=>setTimeout(r,100));
-  if(!window.claude||!window.claude.use)return;
-  const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
-  if(!db||!user)return;const id=await user.id();if(!id)return;
-  dbRef=db.doc('data/users/'+id+'/progress');
-  const snap=await dbRef.get();
-  if(snap.exists){merge(snap.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}rerenderKeepScroll();renderPraxis()}
-  await flush();
-  document.getElementById('saveNote').textContent='Dein Fortschritt wird in deinem Konto gespeichert und ist auf jedem Gerät da.';
- }catch(e){dbRef=null}
-})();
+function viewPractice() {
+  const total = S.words.length;
+  if (!total) return `<div class="card empty"><h2>Noch keine Vokabeln da</h2><p class="muted">Füg unter „Import“ deine erste Vokabelliste ein.</p><button class="btn mt" onclick="go('import')">Vokabeln einfügen</button></div>`;
+  const due = dueWords().length, sure = S.words.filter(w => w.box >= 3).length, n = sizeVal();
+  return `
+  <div class="stats">
+    <div class="card"><div class="big">${due}</div><div class="muted">heute fällig</div></div>
+    <div class="card"><div class="big">${streak()}</div><div class="muted">Tage am Stück</div></div>
+    <div class="card"><div class="big">${sure}</div><div class="muted">von ${total} sitzen</div></div>
+  </div>
+  <div class="card">
+    <h2>Wiederholen</h2>
+    <p class="muted">${due ? 'Die App nimmt die Wörter, die heute dran sind. Neue Wörter sind auch dabei.' : 'Für heute ist alles wiederholt. Morgen sind wieder Wörter fällig.'}</p>
+    <button class="btn mt" ${due ? '' : 'disabled'} onclick="startDue()">Runde starten${due ? ` (${n ? Math.min(due, n) : due} Wörter)` : ''}</button>
+  </div>
+  <div class="card">
+    <h2>Eigene Übung</h2>
+    <p class="muted">Du suchst dir Lektionen oder einzelne Wörter aus, zum Beispiel für den nächsten Test.</p>
+    <button class="btn sec mt" onclick="openSelect()">Wörter auswählen</button>
+  </div>
+  <div class="card">
+    <h2>So wird geübt</h2>
+    <label class="lbl">Richtung</label>${seg('dir', [['de-en', 'Deutsch → Englisch'], ['en-de', 'Englisch → Deutsch'], ['mix', 'Gemischt']])}
+    <label class="lbl">Übungsart</label>${seg('mode', [['auto', 'Automatisch'], ['mc', 'Auswählen'], ['type', 'Eintippen'], ['listen', 'Hören']])}
+    <p class="muted mt">${modeHint()}</p>
+    <label class="lbl">Wörter pro Runde beim Wiederholen</label>${seg('size', [[10, '10'], [20, '20'], [0, 'Alle']])}
+    <p class="muted mt">Bei der eigenen Übung kommen immer alle ausgewählten Wörter dran.</p>
+  </div>`;
 }
+
+// ---------- Auswahl ----------
+let sel = new Set(), openL = new Set(), selFilter = 'all';
+function openSelect() { sel = new Set(); go('select'); }
+function filt(w) {
+  if (selFilter === 'hard') return (w.wrong || 0) > 0 && (w.box || 0) <= 2;
+  if (selFilter === 'new') return !w.box;
+  return true;
+}
+const selWords = id => lessonWords(id).filter(filt);
+function viewSelect() {
+  if (!S.words.length) return `<div class="card empty"><p class="muted">Noch keine Vokabeln vorhanden.</p></div>`;
+  let h = `<div class="card">
+    <label class="lbl" style="margin-top:0">Zeigen</label>
+    <div class="seg">${[['all', 'Alle'], ['hard', 'Schwierige'], ['new', 'Neue']].map(([v, l]) => `<button class="${selFilter === v ? 'on' : ''}" onclick="setFilter('${v}')">${l}</button>`).join('')}</div>
+    <div class="row mt"><button class="btn ghost" onclick="selAll(true)">Alle auswählen</button><button class="btn ghost" onclick="selAll(false)">Keine</button></div>
+  </div>`;
+  let any = false;
+  for (const l of S.lessons) {
+    const ws = selWords(l.id); if (!ws.length) continue; any = true;
+    const n = ws.filter(w => sel.has(w.id)).length;
+    const open = openL.has(l.id);
+    h += `<div class="card ${open ? 'open' : ''}">
+      <div class="lesson-head">
+        <input type="checkbox" ${n === ws.length ? 'checked' : ''} ${n > 0 && n < ws.length ? 'data-partial' : ''} onclick="event.stopPropagation();toggleLesson('${l.id}',this.checked)">
+        <div class="grow" onclick="toggleOpen('${l.id}')"><div class="en">${esc(l.name)}</div><div class="de">${n} von ${ws.length} ausgewählt</div></div>
+        <span class="chev" onclick="toggleOpen('${l.id}')">›</span>
+      </div>`;
+    if (open) {
+      h += '<ul class="list mt">' + ws.map(w => `<li onclick="toggleWord('${w.id}')">
+        <input type="checkbox" ${sel.has(w.id) ? 'checked' : ''} onclick="event.stopPropagation();toggleWord('${w.id}')">
+        <div class="grow"><div class="en">${esc(w.en)}</div><div class="de">${esc(w.de)}</div></div>${dots(w.box)}</li>`).join('') + '</ul>';
+    }
+    h += '</div>';
+  }
+  if (!any) h += `<div class="card empty"><p class="muted">${selFilter === 'hard' ? 'Gerade gibt es keine schwierigen Wörter.' : 'Keine neuen Wörter vorhanden.'}</p></div>`;
+  h += `<div class="sticky-bottom"><button class="btn" ${sel.size ? '' : 'disabled'} onclick="startSelected()">Übung starten (${sel.size} ${sel.size === 1 ? 'Wort' : 'Wörter'})</button></div>`;
+  return h;
+}
+function setFilter(v) { selFilter = v; sel = new Set(); render(); }
+function selAll(on) { sel = new Set(); if (on) S.lessons.forEach(l => selWords(l.id).forEach(w => sel.add(w.id))); render(); }
+function toggleLesson(id, on) { selWords(id).forEach(w => on ? sel.add(w.id) : sel.delete(w.id)); render(); }
+function toggleWord(id) { sel.has(id) ? sel.delete(id) : sel.add(id); render(); }
+function toggleOpen(id) { openL.has(id) ? openL.delete(id) : openL.add(id); render(); }
+function startSelected() { const ws = [...sel].map(word).filter(Boolean); if (ws.length) startSession(ws, 'Eigene Übung', false); }
+
+// ---------- Übungsrunde ----------
+let SES = null, lastResult = null;
+function startDue() {
+  let ws = dueWords().sort((a, b) => (a.due || 0) - (b.due || 0));
+  const n = sizeVal(); if (n) ws = ws.slice(0, n);
+  startSession(ws, 'Wiederholen', false);
+}
+function startSession(ws, label) {
+  if (!ws.length) return;
+  SES = { label, queue: shuffle(ws.slice()).map(makeItem), pos: 0, right: 0, wrongIds: new Set(), firstSeen: new Set(), answered: false, last: null, prev: null, count: ws.length };
+  if (canSpeak) { try { speechSynthesis.cancel(); } catch (e) {} }
+  go('session');
+}
+function makeItem(w) {
+  const s = S.settings;
+  const dir = s.dir === 'mix' ? (Math.random() < .5 ? 'de-en' : 'en-de') : s.dir;
+  let type = s.mode;
+  if (type === 'auto') {
+    const b = w.box || 0;
+    if (b <= 1) type = 'mc';
+    else if (b >= 3 && canSpeak && Math.random() < .3) type = 'listen';
+    else type = 'type';
+  }
+  if (type === 'listen' && !canSpeak) type = 'type';
+  if (type === 'mc' && distinctTargets(dir, w).length < 2) type = 'type';
+  return { id: w.id, dir, type, tries: 0 };
+}
+function targetOf(it, w) { return (it.type === 'listen' || it.dir === 'de-en') ? { field: w.en, lang: 'en' } : { field: w.de, lang: 'de' }; }
+function distinctTargets(dir, w) {
+  const key = dir === 'de-en' ? 'en' : 'de', lang = dir === 'de-en' ? 'en' : 'de';
+  const own = norm(w[key], lang), seen = new Set([own]), same = [], other = [];
+  for (const x of shuffle(S.words.slice())) {
+    if (x.id === w.id) continue;
+    const n = norm(x[key], lang); if (!n || seen.has(n)) continue; seen.add(n);
+    (x.lessonId === w.lessonId ? same : other).push(x[key]);
+  }
+  return [...same, ...other];
+}
+function ensureOpts(it, w) {
+  if (it.opts) return;
+  const correct = it.dir === 'de-en' ? w.en : w.de;
+  const opts = shuffle([correct, ...distinctTargets(it.dir, w).slice(0, 3)]);
+  it.opts = opts; it.correctIdx = opts.indexOf(correct);
+}
+const cur = () => SES.queue[SES.pos];
+const cw = () => word(cur().id);
+
+function viewSession() {
+  while (SES.pos < SES.queue.length && !word(cur().id)) SES.pos++;
+  if (SES.pos >= SES.queue.length) { setTimeout(finishSession, 0); return ''; }
+  const it = cur(), w = word(it.id);
+  const pct = Math.round(SES.pos / SES.queue.length * 100);
+  let h = `<div class="progress"><i style="width:${pct}%"></i></div>
+    <div class="muted center">${SES.pos + 1} von ${SES.queue.length}${it.tries ? ' · nochmal' : ''}</div>
+    <div class="card q mt">`;
+  if (it.type === 'listen') {
+    h += `<div class="hint">Hör zu und schreib das englische Wort auf</div>
+      <div class="row mt" style="max-width:340px;margin:14px auto 0"><button class="btn sec" onclick="speakId('${w.id}')">Anhören</button><button class="btn ghost" onclick="speakId('${w.id}',0.55)">Langsam</button></div>`;
+  } else {
+    const p = it.dir === 'de-en' ? w.de : w.en;
+    h += `<div class="hint">${it.dir === 'de-en' ? 'Wie heißt das auf Englisch?' : 'Was heißt das auf Deutsch?'}</div><div class="prompt">${esc(p)}</div>`;
+    if (it.dir === 'en-de' && canSpeak) h += `<button class="icon" onclick="speakId('${w.id}')" aria-label="Vorlesen">${ICON_SPEAK}</button>`;
+  }
+  h += '</div>';
+  if (it.type === 'mc') {
+    ensureOpts(it, w);
+    h += '<div class="opts">' + it.opts.map((o, i) => {
+      let c = '';
+      if (SES.answered) { if (i === it.correctIdx) c = 'right'; else if (i === it.chosen) c = 'wrong'; }
+      return `<button class="opt ${c}" ${SES.answered ? 'disabled' : ''} onclick="chooseOpt(${i})">${esc(o)}</button>`;
+    }).join('') + '</div>';
+  } else if (!SES.answered) {
+    const t = targetOf(it, w);
+    h += `<div class="card"><input type="text" id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${t.lang === 'en' ? 'auf Englisch' : 'auf Deutsch'}" onkeydown="if(event.key==='Enter'){event.preventDefault();submitTyped()}">
+      <div class="row mt"><button class="btn ghost" onclick="answer(false,'')">Weiß ich nicht</button><button class="btn" onclick="submitTyped()">Prüfen</button></div></div>`;
+  }
+  if (SES.answered) h += feedback(it, w);
+  return h;
+}
+function feedback(it, w) {
+  const L = SES.last, t = targetOf(it, w);
+  let msg;
+  if (L.overridden) msg = '<b>Wird als richtig gezählt.</b>';
+  else if (L.ok && L.exact) msg = '<b>Richtig!</b>';
+  else if (L.ok) msg = `<b>Fast richtig.</b><br>Geschrieben wird es so: ${esc(t.field)}`;
+  else msg = `<b>Leider falsch.</b>${L.given ? `<br>Deine Antwort: ${esc(L.given)}` : ''}`;
+  return `<div class="fb ${L.ok ? 'ok' : 'bad'}">${msg}
+      <div class="row mt"><div class="grow"><div class="en">${esc(w.en)}</div><div class="de">${esc(w.de)}</div></div>${canSpeak ? `<button class="icon" onclick="speakId('${w.id}')" aria-label="Vorlesen">${ICON_SPEAK}</button>` : ''}</div>
+    </div>
+    <div class="row mt">${!L.ok && L.given && it.type !== 'mc' ? `<button class="btn ghost" onclick="override()">War doch richtig</button>` : ''}<button class="btn" id="nextBtn" onclick="next()">Weiter</button></div>`;
+}
+function submitTyped() {
+  const inp = $('#ans'); if (!inp) return;
+  const val = inp.value; if (!val.trim()) { inp.focus(); return; }
+  const it = cur(), w = word(it.id), t = targetOf(it, w);
+  const r = check(val, t.field, t.lang);
+  answer(r.ok, val, r.exact !== false);
+}
+function chooseOpt(i) {
+  if (SES.answered) return;
+  const it = cur(); it.chosen = i;
+  answer(i === it.correctIdx, it.opts[i], true);
+}
+function answer(ok, given, exact = true) {
+  if (SES.answered) return;
+  const it = cur(), w = word(it.id);
+  SES.answered = true;
+  SES.last = { ok, given, exact, first: !SES.firstSeen.has(it.id), requeued: false };
+  if (SES.last.first) {
+    SES.firstSeen.add(it.id);
+    SES.prev = { box: w.box, due: w.due, right: w.right, wrong: w.wrong, last: w.last };
+    applySRS(w, ok);
+    if (ok) SES.right++; else SES.wrongIds.add(it.id);
+  }
+  // Falsche Wörter kommen am Ende der Runde noch einmal dran (höchstens zweimal)
+  if (!ok && it.tries < 2) { SES.queue.push({ id: it.id, dir: it.dir, type: it.type, tries: it.tries + 1 }); SES.last.requeued = true; }
+  save(); render();
+  if (S.settings.autoSpeak && canSpeak) speak(w.en);
+}
+function override() {
+  const it = cur(), w = word(it.id), L = SES.last;
+  if (!L || L.ok) return;
+  if (L.first) { Object.assign(w, SES.prev); applySRS(w, true); SES.right++; SES.wrongIds.delete(it.id); }
+  if (L.requeued) SES.queue.pop();
+  L.ok = true; L.overridden = true;
+  save(); render();
+}
+function next() {
+  if (!SES.answered) return;
+  SES.pos++; SES.answered = false; SES.last = null;
+  if (SES.pos >= SES.queue.length) finishSession(); else { render(); window.scrollTo(0, 0); }
+}
+function finishSession() {
+  if (!SES) return;
+  bumpStreak();
+  S.history.push({ date: todayStr(), words: SES.count, right: SES.right });
+  if (S.history.length > 200) S.history = S.history.slice(-200);
+  save();
+  lastResult = { count: SES.count, right: SES.right, wrong: [...SES.wrongIds] };
+  SES = null;
+  go('result');
+}
+function quitSession() {
+  if (SES.firstSeen.size && !confirm('Runde beenden? Was du schon beantwortet hast, bleibt gespeichert.')) return;
+  if (SES.firstSeen.size) { bumpStreak(); save(); }
+  SES = null; go('practice');
+}
+function viewResult() {
+  if (!lastResult) return '';
+  const R = lastResult, ws = R.wrong.map(word).filter(Boolean);
+  let h = `<div class="card center"><div class="big">${R.right} von ${R.count}</div><p class="muted">beim ersten Versuch richtig</p></div>`;
+  if (ws.length) {
+    h += `<div class="card"><h2>Diese Wörter üben wir noch</h2><ul class="list">${ws.map(w => `<li><div class="grow"><div class="en">${esc(w.en)}</div><div class="de">${esc(w.de)}</div></div>${canSpeak ? `<button class="icon" onclick="speakId('${w.id}')">${ICON_SPEAK}</button>` : ''}</li>`).join('')}</ul>
+      <button class="btn mt" onclick="startWrong()">Diese Wörter gleich nochmal üben</button></div>`;
+  } else h += `<div class="card center"><p>Alles beim ersten Mal gewusst.</p></div>`;
+  h += `<button class="btn ghost" onclick="go('practice')">Zur Übersicht</button>`;
+  return h;
+}
+function startWrong() { const ws = lastResult.wrong.map(word).filter(Boolean); startSession(ws, 'Fehler üben'); }
+
+// ---------- Vokabeln verwalten ----------
+let editId = null;
+function viewWords() {
+  let h = '';
+  if (!S.lessons.length) h += `<div class="card empty"><h2>Noch keine Lektionen</h2><p class="muted">Leg eine Lektion an oder füg gleich eine Vokabelliste ein.</p></div>`;
+  for (const l of S.lessons) {
+    const ws = lessonWords(l.id), sure = ws.filter(w => w.box >= 3).length;
+    const pct = ws.length ? Math.round(sure / ws.length * 100) : 0;
+    h += `<div class="card lesson-head" onclick="go('lesson:${l.id}')">
+      <div class="grow"><div class="en">${esc(l.name)}</div><div class="de">${ws.length} ${ws.length === 1 ? 'Wort' : 'Wörter'}, ${sure} sitzen</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+      <span class="chev">›</span></div>`;
+  }
+  h += `<div class="row"><button class="btn sec" onclick="addLesson()">Neue Lektion</button><button class="btn sec" onclick="go('import')">Liste einfügen</button></div>`;
+  return h;
+}
+function addLesson() {
+  const name = prompt('Name der Lektion', 'Unit ' + (S.lessons.length + 1));
+  if (!name || !name.trim()) return;
+  const l = { id: uid(), name: name.trim(), created: Date.now() };
+  S.lessons.push(l); save(); go('lesson:' + l.id);
+}
+function viewLesson(l) {
+  const ws = lessonWords(l.id);
+  let h = `<div class="card">
+    <h2>Neues Wort</h2>
+    <div class="edit-grid">
+      <input type="text" id="newEn" placeholder="Englisch" autocapitalize="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();$('#newDe').focus()}">
+      <input type="text" id="newDe" placeholder="Deutsch (mehrere Bedeutungen mit / trennen)" onkeydown="if(event.key==='Enter'){event.preventDefault();addWord('${l.id}')}">
+      <button class="btn" onclick="addWord('${l.id}')">Hinzufügen</button>
+    </div></div>`;
+  if (ws.length) {
+    h += `<button class="btn mb" onclick="startSession(lessonWords('${l.id}'),${esc(JSON.stringify(l.name))})">Diese Lektion üben (${ws.length})</button><div class="card mt"><ul class="list">`;
+    for (const w of ws) {
+      if (editId === w.id) {
+        h += `<li><div class="edit-grid">
+          <input type="text" id="edEn" value="${esc(w.en)}" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <input type="text" id="edDe" value="${esc(w.de)}">
+          <div class="row"><button class="btn" onclick="saveWord('${w.id}')">Speichern</button><button class="btn ghost" onclick="editId=null;render()">Abbrechen</button></div>
+          <div class="row"><button class="btn ghost" onclick="resetWord('${w.id}')">Lernstand zurücksetzen</button><button class="btn danger" onclick="delWord('${w.id}')">Löschen</button></div>
+        </div></li>`;
+      } else {
+        h += `<li>
+          ${canSpeak ? `<button class="icon" onclick="speakId('${w.id}')" aria-label="Vorlesen">${ICON_SPEAK}</button>` : ''}
+          <div class="grow" onclick="editId='${w.id}';render()"><div class="en">${esc(w.en)}</div><div class="de">${esc(w.de)}</div></div>
+          ${dots(w.box)}
+          <button class="icon" onclick="editId='${w.id}';render()" aria-label="Bearbeiten">✎</button></li>`;
+      }
+    }
+    h += '</ul></div>';
+  } else h += `<div class="card empty"><p class="muted">Diese Lektion ist noch leer.</p></div>`;
+  h += `<div class="row"><button class="btn ghost" onclick="renameLesson('${l.id}')">Umbenennen</button><button class="btn danger" onclick="delLesson('${l.id}')">Lektion löschen</button></div>`;
+  return h;
+}
+function addWord(lid) {
+  const en = $('#newEn').value.trim(), de = $('#newDe').value.trim();
+  if (!en || !de) { toast('Bitte Englisch und Deutsch ausfüllen'); return; }
+  S.words.push(newWord(lid, en, de)); save(); render();
+  const n = $('#newEn'); if (n) n.focus();
+}
+function saveWord(id) {
+  const w = word(id), en = $('#edEn').value.trim(), de = $('#edDe').value.trim();
+  if (!en || !de) { toast('Bitte beide Felder ausfüllen'); return; }
+  w.en = en; w.de = de; editId = null; save(); render();
+}
+function resetWord(id) { const w = word(id); Object.assign(w, { box: 0, due: 0, right: 0, wrong: 0, last: 0 }); editId = null; save(); render(); toast('Lernstand zurückgesetzt'); }
+function delWord(id) { if (!confirm('Dieses Wort löschen?')) return; S.words = S.words.filter(w => w.id !== id); editId = null; save(); render(); }
+function renameLesson(id) { const l = lesson(id), n = prompt('Neuer Name', l.name); if (!n || !n.trim()) return; l.name = n.trim(); save(); render(); }
+function delLesson(id) {
+  const l = lesson(id), n = lessonWords(id).length;
+  if (!confirm(`„${l.name}“ mit ${n} ${n === 1 ? 'Wort' : 'Wörtern'} löschen?`)) return;
+  S.lessons = S.lessons.filter(x => x.id !== id); S.words = S.words.filter(w => w.lessonId !== id);
+  save(); go('words');
+}
+
+// ---------- Import ----------
+let imp = { text: '', lessonId: '', newName: '', alt: false, deFirst: false, preview: null };
+const SEPS = [/\t+/, / {2,}/, /\s*=\s*/, /\s+[–—-]\s+/, /\s*;\s*/, /\s*:\s+/, /\s*[–—]\s*/];
+function splitLine(line) {
+  for (const re of SEPS) {
+    const m = line.match(re);
+    if (m && m.index > 0) {
+      const a = line.slice(0, m.index).trim(), b = line.slice(m.index + m[0].length).trim();
+      if (a && b) return [a, b];
+    }
+  }
+  return null;
+}
+function parseImport() {
+  const lines = imp.text.split(/\r?\n/).map(s => s.replace(/^\s*\d+[.)]\s+/, '').trim()).filter(Boolean);
+  const items = [], bad = [];
+  if (imp.alt) {
+    for (let i = 0; i + 1 < lines.length; i += 2) items.push([lines[i], lines[i + 1]]);
+    if (lines.length % 2) bad.push(lines[lines.length - 1]);
+  } else {
+    for (const l of lines) { const p = splitLine(l); p ? items.push(p) : bad.push(l); }
+  }
+  return { items: imp.deFirst ? items.map(([a, b]) => [b, a]) : items, bad };
+}
+function viewImport() {
+  if (!imp.lessonId || (imp.lessonId !== '__new' && !lesson(imp.lessonId))) imp.lessonId = S.lessons.length ? S.lessons[S.lessons.length - 1].id : '__new';
+  let h = `<div class="card">
+    <label class="lbl" style="margin-top:0">In welche Lektion?</label>
+    <select onchange="imp.lessonId=this.value;imp.preview=null;render()">
+      ${S.lessons.map(l => `<option value="${l.id}" ${imp.lessonId === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}
+      <option value="__new" ${imp.lessonId === '__new' ? 'selected' : ''}>Neue Lektion …</option>
+    </select>
+    ${imp.lessonId === '__new' ? `<input type="text" class="mt" placeholder="Name, z. B. Unit 3" value="${esc(imp.newName)}" oninput="imp.newName=this.value">` : ''}
+    <label class="lbl">Vokabeln</label>
+    <textarea id="impText" placeholder="Eine Vokabel pro Zeile, zum Beispiel:&#10;dog = Hund&#10;to go - gehen&#10;bench; Bank / Sitzbank" oninput="imp.text=this.value;imp.preview=null">${esc(imp.text)}</textarea>
+    <label class="lbl">Aufbau der Liste</label>
+    <div class="seg"><button class="${!imp.alt ? 'on' : ''}" onclick="imp.alt=false;imp.preview=null;render()">Beides in einer Zeile</button><button class="${imp.alt ? 'on' : ''}" onclick="imp.alt=true;imp.preview=null;render()">Zeilen abwechselnd</button></div>
+    <label class="chk"><input type="checkbox" ${imp.deFirst ? 'checked' : ''} onchange="imp.deFirst=this.checked;imp.preview=null;render()">Deutsch steht zuerst</label>
+    <button class="btn mt" onclick="showPreview()">Vorschau</button>
+  </div>`;
+  if (imp.preview) {
+    const { items, bad } = imp.preview;
+    h += `<div class="card"><h2>${items.length} ${items.length === 1 ? 'Vokabel' : 'Vokabeln'} erkannt</h2>`;
+    if (items.length) h += `<table class="prev"><tr><td class="muted">Englisch</td><td class="muted">Deutsch</td></tr>${items.map(([e, d]) => `<tr><td>${esc(e)}</td><td>${esc(d)}</td></tr>`).join('')}</table>`;
+    if (bad.length) h += `<p class="muted mt">Diese Zeilen konnte ich nicht zuordnen:</p><ul>${bad.map(b => `<li class="muted">${esc(b)}</li>`).join('')}</ul>`;
+    if (items.length) h += `<button class="btn mt" onclick="commitImport()">Übernehmen</button>`;
+    h += '</div>';
+  }
+  h += `<div class="card"><h2>Vokabeln von einem Foto</h2>
+    <p class="muted">Am iPhone geht das ohne Abtippen: Foto in der Fotos-App öffnen, lange auf den Text tippen, „Alle auswählen“ und „Kopieren“. Dann hier einfügen. Wenn Englisch und Deutsch danach untereinander statt nebeneinander stehen, „Zeilen abwechselnd“ wählen. Vor dem Übernehmen lohnt ein Blick in die Vorschau.</p></div>`;
+  return h;
+}
+function showPreview() {
+  const t = $('#impText'); if (t) imp.text = t.value;
+  if (!imp.text.trim()) { toast('Erst Vokabeln einfügen'); return; }
+  imp.preview = parseImport(); render();
+}
+function commitImport() {
+  let lid = imp.lessonId;
+  if (lid === '__new') {
+    const l = { id: uid(), name: imp.newName.trim() || ('Unit ' + (S.lessons.length + 1)), created: Date.now() };
+    S.lessons.push(l); lid = l.id;
+  }
+  const have = new Set(lessonWords(lid).map(w => norm(w.en, 'en') + '|' + norm(w.de, 'de')));
+  let added = 0, dup = 0;
+  for (const [en, de] of imp.preview.items) {
+    const k = norm(en, 'en') + '|' + norm(de, 'de');
+    if (have.has(k)) { dup++; continue; }
+    have.add(k); S.words.push(newWord(lid, en, de)); added++;
+  }
+  save();
+  imp = { text: '', lessonId: lid, newName: '', alt: imp.alt, deFirst: imp.deFirst, preview: null };
+  toast(`${added} übernommen${dup ? `, ${dup} waren schon da` : ''}`);
+  go('lesson:' + lid);
+}
+
+// ---------- Mehr ----------
+function viewMore() {
+  const boxes = [0, 0, 0, 0, 0, 0]; S.words.forEach(w => boxes[w.box || 0]++);
+  const rounds = S.history.length;
+  let h = `<div class="card"><h2>Lernstand</h2>
+    <ul class="list">
+      <li><div class="grow">Neu, noch nicht geübt</div><b>${boxes[0]}</b></li>
+      <li><div class="grow">Fach 1 und 2, noch unsicher</div><b>${boxes[1] + boxes[2]}</b></li>
+      <li><div class="grow">Fach 3 und 4, sitzt meistens</div><b>${boxes[3] + boxes[4]}</b></li>
+      <li><div class="grow">Fach 5, sitzt</div><b>${boxes[5]}</b></li>
+      <li><div class="grow">Geübte Runden</div><b>${rounds}</b></li>
+    </ul></div>`;
+  h += `<div class="card"><h2>Vorlesen</h2>`;
+  if (!canSpeak) h += `<p class="muted">Dieser Browser kann nicht vorlesen.</p>`;
+  else {
+    h += voices.length
+      ? `<label class="lbl" style="margin-top:0">Stimme</label><select onchange="S.settings.voice=this.value;save()"><option value="">Automatisch (britisch, falls vorhanden)</option>${voices.map(v => `<option value="${esc(v.voiceURI)}" ${S.settings.voice === v.voiceURI ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})</option>`).join('')}</select>`
+      : `<p class="muted">Noch keine englische Stimme geladen. Zum Testen einmal auf „Probe hören“ tippen.</p>`;
+    h += `<label class="chk"><input type="checkbox" ${S.settings.autoSpeak ? 'checked' : ''} onchange="S.settings.autoSpeak=this.checked;save()">Nach jeder Antwort das englische Wort vorlesen</label>
+      <button class="btn sec mt" onclick="speak('Hello! This is your vocabulary trainer.')">Probe hören</button>
+      <p class="muted mt">Kein Ton? Am iPhone darf der Stummschalter nicht aktiv sein, sonst bleibt die Sprachausgabe im Browser still. Lauter stellen hilft dann nicht. Englische Stimmen lassen sich unter Einstellungen, Bedienungshilfen, Gesprochene Inhalte, Stimmen, Englisch nachladen.</p>`;
+  }
+  h += `</div>
+  <div class="card"><h2>Sicherung</h2>
+    <p class="muted">Vokabeln und Lernstand liegen nur auf diesem Gerät im Browser. Speicher ab und zu eine Sicherung, zum Beispiel in der Dateien-App. Am iPhone die App am besten über „Teilen“ und „Zum Home-Bildschirm“ öffnen, dann löscht Safari die Daten nicht nach längerer Pause.</p>
+    <button class="btn sec mt" onclick="exportData()">Sicherung speichern</button>
+    <button class="btn ghost mt" onclick="$('#restore').click()">Sicherung laden</button>
+    <input type="file" id="restore" accept=".json,application/json" style="display:none" onchange="importData(this)">
+  </div>
+  <div class="card"><h2>Zurücksetzen</h2>
+    <button class="btn ghost" onclick="resetProgress()">Lernstand aller Wörter zurücksetzen</button>
+    <button class="btn danger mt" onclick="wipeAll()">Alles löschen</button>
+  </div>
+  <span class="v">Vokabeltrainer ${APP_VERSION}</span>`;
+  return h;
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify(Object.assign({ app: 'vokabeltrainer', appVersion: APP_VERSION }, S), null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'vokabeltrainer-sicherung-' + todayStr() + '.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+function importData(input) {
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!Array.isArray(d.words) || !Array.isArray(d.lessons)) throw new Error();
+      if (!confirm('Die Sicherung ersetzt alle Vokabeln und den Lernstand auf diesem Gerät. Weiter?')) return;
+      delete d.app; delete d.appVersion;
+      S = Object.assign(defaults(), d); S.settings = Object.assign(defaults().settings, d.settings || {});
+      save(); toast('Sicherung geladen'); go('practice');
+    } catch (e) { toast('Die Datei ist keine gültige Sicherung'); }
+  };
+  r.readAsText(f); input.value = '';
+}
+function resetProgress() {
+  if (!confirm('Lernstand aller Wörter zurücksetzen? Die Vokabeln bleiben erhalten.')) return;
+  S.words.forEach(w => Object.assign(w, { box: 0, due: 0, right: 0, wrong: 0, last: 0 }));
+  S.streak = { last: '', count: 0 }; S.history = [];
+  save(); toast('Lernstand zurückgesetzt'); render();
+}
+function wipeAll() {
+  if (!confirm('Wirklich alle Lektionen, Vokabeln und den Lernstand löschen?')) return;
+  const keep = S.settings; S = defaults(); S.settings = keep; save(); go('practice');
+}
+
+render();
 </script>
 </body>
 </html>
